@@ -1,6 +1,7 @@
 package shopbancancau.controller;
 
 import javax.swing.JOptionPane;
+import shopbancancau.util.Session;
 
 import shopbancancau.dao.UserDAO;
 import shopbancancau.model.User;
@@ -30,10 +31,19 @@ public class LoginController {
             return;
         }
 
-        //  ĐÚNG CHỖ PHÂN QUYỀN
-        POSView posView = new POSView(user.getRole());
+        // ✅ GÁN SESSION Ở ĐÂY
+        Session.currentUser = user;
+
+        // MỞ POS SAU LOGIN
+        POSView posView = new POSView();
         new POSController(posView);
         posView.setVisible(true);
+
         view.dispose();
+        
+        
+        
     }
+    
+    
 }

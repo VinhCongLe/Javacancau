@@ -1,65 +1,56 @@
 package shopbancancau.dao;
+import shopbancancau.util.Session;
+
 
 import java.sql.*;
 
 public class OrderDAO {
-
+	
     // 1️⃣ Tạo hóa đơn (orders)
-    public int createOrder(int userId, int customerId, double total) {
-        String sql = "INSERT INTO orders(user_id, customer_id, order_date, total_amount) VALUES (?, ?, NOW(), ?)";
+	
+	
+	public int createOrder(Connection conn, int userId, int customerId, double total) throws SQLException {
+	    String sql = "INSERT INTO orders(user_id, customer_id, order_date, total_amount) VALUES (?, ?, NOW(), ?)";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+	    try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+	        ps.setInt(1, userId);
+	        ps.setInt(2, customerId);
+	        ps.setDouble(3, total);
+	        ps.executeUpdate();
 
-            ps.setInt(1, userId);
-            ps.setInt(2, customerId);
-            ps.setDouble(3, total);
-            ps.executeUpdate();
+	        ResultSet rs = ps.getGeneratedKeys();
+	        if (rs.next()) {
+	            return rs.getInt(1);
+	        }
+	    }
+	    return -1;
+	}
 
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1); // order_id
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
 
     // 2️⃣ Thêm chi tiết hóa đơn (order_details)
-    public void addOrderDetail(int orderId, int productId, int quantity, double price) {
-        String sql = "INSERT INTO order_details(order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
+	public void addOrderDetail(Connection conn, int orderId, int productId, int quantity, double price) throws SQLException {
+	    String sql = "INSERT INTO order_details(order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+	    PreparedStatement ps = conn.prepareStatement(sql);
+	    ps.setInt(1, orderId);
+	    ps.setInt(2, productId);
+	    ps.setInt(3, quantity);
+	    ps.setDouble(4, price);
+	    ps.executeUpdate();
+	}
 
-            ps.setInt(1, orderId);
-            ps.setInt(2, productId);
-            ps.setInt(3, quantity);
-            ps.setDouble(4, price);
-            ps.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     // 3️⃣ Trừ tồn kho (products)
-    public void updateQuantity(int productId, int quantitySold) {
-        String sql = "UPDATE products SET quantity = quantity - ? WHERE product_id = ?";
+	public void updateQuantity(Connection conn, int productId, int quantity) throws SQLException {
+	    String sql = "UPDATE products SET quantity = quantity - ? WHERE product_id = ?";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+	    PreparedStatement ps = conn.prepareStatement(sql);
+	    ps.setInt(1, quantity);
+	    ps.setInt(2, productId);
+	    ps.executeUpdate();
+	}
 
-            ps.setInt(1, quantitySold);
-            ps.setInt(2, productId);
-            ps.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     
     public ResultSet getAllOrders() {
         String sql = "SELECT order_id, order_date, total_amount FROM orders ORDER BY order_id DESC";
