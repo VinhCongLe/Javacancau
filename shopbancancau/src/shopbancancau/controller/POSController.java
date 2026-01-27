@@ -5,10 +5,8 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.text.NumberFormat;
 import java.util.Locale;
-
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-
 import shopbancancau.dao.CustomerDAO;
 import shopbancancau.dao.DBConnection;
 import shopbancancau.dao.OrderDAO;
@@ -18,34 +16,37 @@ import shopbancancau.util.Session;
 import shopbancancau.view.CreateUserView;
 import shopbancancau.view.OrderHistoryView;
 import shopbancancau.view.POSView;
+import shopbancancau.view.LoginView;
 
 public class POSController {
-
     private POSView view;
     private OrderDAO orderDAO;
     private ProductDAO productDAO;
     private CustomerDAO customerDAO;
-    
 
-    public POSController(POSView view) { // contructor
+    public POSController(POSView view) {
         this.view = view;
         this.orderDAO = new OrderDAO();
         this.productDAO = new ProductDAO();
         this.customerDAO = new CustomerDAO();
 
-
-        // ❗ CHẮN SESSION
+        // CHẮN SESSION
         if (Session.currentUser == null) {
             JOptionPane.showMessageDialog(view, "Vui lòng đăng nhập!");
             view.dispose();
             return;
         }
-        
-     // PHÂN QUYỀN MENU
-        if (!Session.currentUser.getRole().equalsIgnoreCase("ADMIN")) {
-            view.getMenuCreateUser().setVisible(false);
-        }
 
+        // PHÂN QUYỀN MENU – CHỈ ẨN "Quản lý tài khoản" nếu KHÔNG PHẢI ADMIN
+        if (!"ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
+            view.getMenuCreateUser().setVisible(false);
+            // KHÔNG ẨN menuOrderHistory → user thường VẪN THẤY "Lịch sử hóa đơn"
+            view.getMenuOrderHistory().setVisible(true);
+        } else {
+            // ADMIN thấy cả 2
+            view.getMenuCreateUser().setVisible(true);
+            view.getMenuOrderHistory().setVisible(true);
+        }
 
         loadProducts();
 
@@ -55,32 +56,52 @@ public class POSController {
         view.getBtnRemove().addActionListener(e -> removeItem());
         view.getMenuOrderHistory().addActionListener(e -> openOrderHistory());
         view.getMenuCreateUser().addActionListener(e -> openCreateUser());
+
+        view.getMenuLogout().addActionListener(e -> logout());
     }
 
-    /* ================== LOAD SẢN PHẨM ================== */
+    /* ================== ĐĂNG XUẤT ================== */
+    private void logout() {
+        int confirm = JOptionPane.showOptionDialog(
+            view,
+            "Bạn có chắc chắn muốn đăng xuất?",
+            "Xác nhận Đăng xuất",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            new Object[]{"Có", "Không"},
+            "Có"
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            Session.currentUser = null;
+            view.dispose();
+
+            LoginView loginView = new LoginView();
+            new LoginController(loginView);
+            loginView.setVisible(true);
+        }
+    }
+
+    // Các phần còn lại giữ nguyên (loadProducts, AddHandler, removeItem, PayHandler, updateTotal, formatMoney, openOrderHistory, openCreateUser)
     private void loadProducts() {
         view.getCbProduct().removeAllItems();
         for (Product p : productDAO.getAllProducts()) {
             view.getCbProduct().addItem(p);
         }
     }
-    
-    
 
-    /* ================== THÊM VÀO HÓA ĐƠN ================== */
     class AddHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 Product p = (Product) view.getCbProduct().getSelectedItem();
                 if (p == null) return;
-
                 int quantity = Integer.parseInt(view.getTxtQuantity().getText());
                 if (quantity <= 0) {
                     JOptionPane.showMessageDialog(view, "Số lượng phải > 0");
                     return;
                 }
-
                 if (quantity > p.getQuantity()) {
                     JOptionPane.showMessageDialog(
                         view,
@@ -88,9 +109,7 @@ public class POSController {
                     );
                     return;
                 }
-
                 double total = p.getPrice() * quantity;
-
                 DefaultTableModel model = view.getTableModel();
                 model.addRow(new Object[]{
                     p.getProductName(),
@@ -98,44 +117,34 @@ public class POSController {
                     p.getPrice(),
                     total
                 });
-
                 updateTotal();
                 view.getTxtQuantity().setText("");
-
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(view, "Số lượng không hợp lệ");
             }
         }
     }
 
-    /* ================== XÓA DÒNG ================== */
     private void removeItem() {
         int row = view.getTable().getSelectedRow();
         if (row == -1) return;
-
         view.getTableModel().removeRow(row);
         updateTotal();
     }
 
-    /* ================== THANH TOÁN – TRANSACTION ================== */
     class PayHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             DefaultTableModel model = view.getTableModel();
-
             if (model.getRowCount() == 0) {
                 JOptionPane.showMessageDialog(view, "Chưa có sản phẩm để thanh toán");
                 return;
             }
-
             Connection conn = null;
-
             try {
-                // ===== BEGIN =====
                 conn = DBConnection.getConnection();
                 conn.setAutoCommit(false);
 
-                // Lấy tổng tiền
                 String totalText = view.getLblTotal().getText()
                         .replace(" VND", "")
                         .replace(".", "")
@@ -152,51 +161,33 @@ public class POSController {
                 }
 
                 int customerId = customerDAO.getOrCreateCustomer(conn, customerName, phone);
-
-
-
-                // 1️⃣ orders
                 int orderId = orderDAO.createOrder(conn, userId, customerId, totalAmount);
                 if (orderId == -1) {
                     throw new Exception("Không tạo được hóa đơn");
                 }
 
-                // 2️⃣ order_details + trừ kho
                 for (int i = 0; i < model.getRowCount(); i++) {
                     String productName = (String) model.getValueAt(i, 0);
                     int quantity = (int) model.getValueAt(i, 1);
                     double price = (double) model.getValueAt(i, 2);
-
                     int productId = productDAO.getProductIdByName(productName);
-
                     orderDAO.addOrderDetail(conn, orderId, productId, quantity, price);
                     orderDAO.updateQuantity(conn, productId, quantity);
                 }
 
-                // ===== COMMIT =====
                 conn.commit();
+                JOptionPane.showMessageDialog(view, "Thanh toán thành công!");
 
-                JOptionPane.showMessageDialog(
-                	    view,
-                	    "Thanh toán thành công!"
-                	);
-                // Reset UI
                 model.setRowCount(0);
                 view.getLblTotal().setText("0 VND");
                 view.clearCustomerInfo();
                 loadProducts();
-
             } catch (Exception ex) {
                 ex.printStackTrace();
                 try {
                     if (conn != null) conn.rollback();
                 } catch (Exception ignore) {}
-
-                JOptionPane.showMessageDialog(
-                    view,
-                    "Thanh toán thất bại, dữ liệu đã được hoàn tác!"
-                );
-
+                JOptionPane.showMessageDialog(view, "Thanh toán thất bại, dữ liệu đã được hoàn tác!");
             } finally {
                 try {
                     if (conn != null) {
@@ -208,15 +199,12 @@ public class POSController {
         }
     }
 
-    /* ================== TỔNG TIỀN ================== */
     private void updateTotal() {
         double sum = 0;
         DefaultTableModel model = view.getTableModel();
-
         for (int i = 0; i < model.getRowCount(); i++) {
             sum += (double) model.getValueAt(i, 3);
         }
-
         view.getLblTotal().setText(formatMoney(sum));
     }
 
@@ -225,7 +213,6 @@ public class POSController {
         return vn.format(amount) + " VND";
     }
 
-    /* ================== MENU ================== */
     private void openOrderHistory() {
         OrderHistoryView v = new OrderHistoryView();
         new OrderHistoryController(v);
