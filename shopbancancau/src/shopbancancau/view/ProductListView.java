@@ -6,6 +6,8 @@ import shopbancancau.model.Product;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.List;
 
@@ -15,10 +17,12 @@ public class ProductListView extends JFrame {
     private JTable table;
     private DefaultTableModel tableModel;
     private JTextField txtName, txtPrice, txtQuantity, txtCategory, txtDescription, txtSupplier, txtImage;
-    private JButton btnAdd, btnUpdate, btnDelete, btnClear;
+    private JButton btnAdd, btnUpdate, btnDelete, btnClear, btnBack;
     private JLabel lblImagePreview;  // ← Preview ảnh
+    private POSView parentView;
 
-    public ProductListView() {
+    public ProductListView(POSView parent) {
+        this.parentView = parent;
         controller = new ProductController(this);
         initComponents();
         controller.loadAllProducts();
@@ -26,11 +30,46 @@ public class ProductListView extends JFrame {
 
     private void initComponents() {
         setTitle("Quản lý sản phẩm - Phụ kiện câu cá");
-        setSize(900, 580);           // Tăng nhẹ để preview ảnh vừa đẹp
-        setMinimumSize(new Dimension(800, 520));
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(1000, 640);           // Tăng ~10% từ 900x580 để hiển thị nhiều hàng hơn
+        setMinimumSize(new Dimension(900, 580));
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(5, 5));
+        
+        // Window listener: dispose and show parent POSView
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                dispose();
+                if (parentView != null) {
+                    parentView.setVisible(true);
+                    parentView.toFront();
+                    parentView.requestFocus();
+                }
+            }
+        });
+        
+        // Nút Quay lại ở góc trên trái
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        topPanel.setBackground(new Color(245, 245, 245));
+        topPanel.setOpaque(false);
+        btnBack = new JButton("← Quay lại");
+        btnBack.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnBack.setPreferredSize(new Dimension(120, 35));
+        btnBack.setBackground(new Color(0, 120, 215)); // Màu xanh
+        btnBack.setForeground(Color.WHITE);
+        btnBack.setFocusPainted(false);
+        btnBack.setBorderPainted(false);
+        btnBack.addActionListener(e -> {
+            dispose();
+            if (parentView != null) {
+                parentView.setVisible(true);
+                parentView.toFront();
+                parentView.requestFocus();
+            }
+        });
+        topPanel.add(btnBack);
+        add(topPanel, BorderLayout.NORTH);
 
         // ------------------- Bảng danh sách -------------------
         String[] columns = {"ID", "Tên sản phẩm", "Giá bán", "Tồn kho", "Loại", "Mô tả", "Nhà cung cấp", "Ảnh"};
@@ -52,10 +91,12 @@ public class ProductListView extends JFrame {
         table.getColumnModel().getColumn(7).setPreferredWidth(130);
 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.setRowHeight(28);
+        table.setRowHeight(30); // Tăng từ 28 lên 30 để dễ đọc hơn
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Danh sách sản phẩm"));
+        // Set preferred viewport size để hiển thị ít nhất 4-5 hàng
+        scrollPane.setPreferredSize(new Dimension(0, 180)); // ~6 rows * 30px = 180px
         add(scrollPane, BorderLayout.CENTER);
 
         // Sự kiện chọn dòng → điền form + preview ảnh
@@ -176,8 +217,6 @@ public class ProductListView extends JFrame {
         southPanel.add(formContainer, BorderLayout.CENTER);
 
         add(southPanel, BorderLayout.SOUTH);
-
-        setVisible(true);
     }
 
     private String getSafeValue(int row, int col) {

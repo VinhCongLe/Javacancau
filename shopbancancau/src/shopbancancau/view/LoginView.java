@@ -3,6 +3,8 @@ package shopbancancau.view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class LoginView extends JFrame {
 
@@ -25,7 +27,26 @@ public class LoginView extends JFrame {
         setTitle("Đăng nhập hệ thống");
         setSize(460, 340);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
+        // Window listener: Xác nhận trước khi đóng
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int confirm = JOptionPane.showConfirmDialog(
+                    LoginView.this,
+                    "Bạn có chắc chắn muốn thoát không?",
+                    "Xác nhận thoát",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                    System.exit(0); // Thoát ứng dụng hoàn toàn
+                }
+                // Nếu chọn "Hủy", không làm gì - cửa sổ vẫn mở
+            }
+        });
+        
         setLayout(new GridBagLayout());
 
         ShadowPanel shadow = new ShadowPanel();

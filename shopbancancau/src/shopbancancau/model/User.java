@@ -5,6 +5,8 @@ public class User {
     private String username;
     private String password;
     private String role;
+    private String fullname;
+    private String phone;
 
     public int getUserId() {
         return userId;
@@ -36,5 +38,21 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

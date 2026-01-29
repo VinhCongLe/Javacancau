@@ -1,6 +1,6 @@
 package shopbancancau.dao;
 
-import shopbancancau.util.DBConnection;  // Giả sử DBConnection nằm ở package util, điều chỉnh nếu khác
+import shopbancancau.dao.DBConnection;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

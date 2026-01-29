@@ -11,6 +11,7 @@ import java.sql.Date;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Calendar;
 
 public class OrderHistoryController {
 
@@ -56,26 +57,45 @@ public class OrderHistoryController {
         }
     }
 
-    // ===== LỌC THEO dd/MM/yyyy =====
+    // ===== LỌC THEO DATE PICKER =====
     private void filterByDate() {
         try {
-            String fromStr = view.getFromDate();
-            String toStr = view.getToDate();
+            java.util.Date fromUtil = view.getFromDate();
+            java.util.Date toUtil = view.getToDate();
 
-            if (fromStr.isEmpty() || toStr.isEmpty()) {
-                JOptionPane.showMessageDialog(view,
-                        "Vui lòng nhập đầy đủ từ ngày và đến ngày");
+            // Kiểm tra đã chọn đầy đủ ngày chưa
+            if (fromUtil == null || toUtil == null) {
+                int choice = JOptionPane.showConfirmDialog(view,
+                        "Bạn chưa chọn đầy đủ ngày. Hiển thị tất cả đơn hàng?",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                if (choice == JOptionPane.YES_OPTION) {
+                    loadOrders(); // Hiển thị tất cả nếu đồng ý
+                }
                 return;
             }
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            sdf.setLenient(false);
+            // Kiểm tra từ ngày <= đến ngày
+            if (fromUtil.after(toUtil)) {
+                JOptionPane.showMessageDialog(view,
+                        "Từ ngày phải nhỏ hơn hoặc bằng đến ngày",
+                        "Lỗi",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
-            java.util.Date fromUtil = sdf.parse(fromStr);
-            java.util.Date toUtil = sdf.parse(toStr);
-
+            // Chuyển đổi java.util.Date sang java.sql.Date
             Date fromDate = new Date(fromUtil.getTime());
-            Date toDate = new Date(toUtil.getTime() + 24 * 60 * 60 * 1000 - 1);
+            
+            // Đặt toDate đến cuối ngày (23:59:59.999)
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(toUtil);
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 999);
+            Date toDate = new Date(cal.getTimeInMillis());
 
             ResultSet rs = orderDAO.getOrdersByDate(fromDate, toDate);
 
@@ -98,8 +118,11 @@ public class OrderHistoryController {
             view.setTotalText("Tổng doanh thu: " + moneyFormat.format(totalSum) + " đ");
 
         } catch (Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(view,
-                    "Sai định dạng ngày. Vui lòng nhập theo dd/MM/yyyy");
+                    "Lỗi khi lọc đơn hàng: " + e.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
