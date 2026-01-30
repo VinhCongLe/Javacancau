@@ -1,6 +1,8 @@
 package shopbancancau.dao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomerDAO {
 
@@ -25,5 +27,44 @@ public class CustomerDAO {
 	    }
 
 	    throw new Exception("Không tạo được khách hàng");
+	}
+
+	// Lấy tất cả khách hàng
+	public List<CustomerInfo> getAllCustomers() {
+	    List<CustomerInfo> list = new ArrayList<>();
+	    String sql = "SELECT customer_id, name, phone FROM customers ORDER BY customer_id ASC";
+	    
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+	        
+	        while (rs.next()) {
+	            CustomerInfo customer = new CustomerInfo();
+	            customer.setId(rs.getInt("customer_id"));
+	            customer.setName(rs.getString("name"));
+	            customer.setPhone(rs.getString("phone"));
+	            list.add(customer);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+	    return list;
+	}
+
+	// Inner class để lưu thông tin khách hàng
+	public static class CustomerInfo {
+	    private int id;
+	    private String name;
+	    private String phone;
+
+	    public int getId() { return id; }
+	    public void setId(int id) { this.id = id; }
+
+	    public String getName() { return name; }
+	    public void setName(String name) { this.name = name; }
+
+	    public String getPhone() { return phone; }
+	    public void setPhone(String phone) { this.phone = phone; }
 	}
 }

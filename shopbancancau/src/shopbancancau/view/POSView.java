@@ -365,13 +365,11 @@ public class POSView extends JFrame {
     public class UserManagementPanel extends JPanel {
         private JTable userTable;
         private DefaultTableModel userTableModel;
-        private JTextField txtUsername;
-        private JComboBox<String> cbRole;
         private JButton btnAdd;
-        private JButton btnSave;
+        private JButton btnEdit;
         private JButton btnDelete;
+        private JButton btnViewDetail;
         private JButton btnBack;
-        private int selectedUserId = -1;
         private POSView parentView;
 
         public UserManagementPanel() {
@@ -420,217 +418,84 @@ public class POSView extends JFrame {
             userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             userTable.setBackground(Color.WHITE);
             
-            // Listener khi chọn dòng trong table
-            userTable.getSelectionModel().addListSelectionListener(e -> {
-                if (!e.getValueIsAdjusting()) {
-                    int row = userTable.getSelectedRow();
-                    if (row >= 0) {
-                        loadUserToForm(row);
-                    } else {
-                        clearForm();
-                    }
-                }
-            });
-
             JScrollPane scrollTable = new JScrollPane(userTable);
             scrollTable.setBorder(BorderFactory.createTitledBorder("Danh sách tài khoản"));
-            scrollTable.setPreferredSize(new Dimension(0, 0));
+            add(scrollTable, BorderLayout.CENTER);
 
-            // Bên phải: Form chi tiết nhỏ gọn (30% chiều rộng)
-            JPanel formPanel = new JPanel(new BorderLayout(5, 5));
-            formPanel.setBorder(BorderFactory.createTitledBorder("Thông tin tài khoản"));
-            formPanel.setBackground(new Color(245, 245, 245));
-            formPanel.setPreferredSize(new Dimension(280, 0));
-
-            // Form fields - chỉ Username và Role
-            JPanel fieldsPanel = new JPanel(new GridBagLayout());
-            fieldsPanel.setBackground(new Color(245, 245, 245));
-            fieldsPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(8, 8, 8, 8);
-            gbc.anchor = GridBagConstraints.WEST;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-
-            // Username
-            gbc.gridx = 0; gbc.gridy = 0;
-            JLabel lblUsername = new JLabel("Username:");
-            lblUsername.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            fieldsPanel.add(lblUsername, gbc);
-            gbc.gridx = 1;
-            gbc.weightx = 1.0;
-            txtUsername = new JTextField();
-            txtUsername.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-            txtUsername.setPreferredSize(new Dimension(0, 32));
-            txtUsername.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-                BorderFactory.createEmptyBorder(4, 8, 4, 8)
-            ));
-            fieldsPanel.add(txtUsername, gbc);
-
-            // Role
-            gbc.gridx = 0; gbc.gridy = 1;
-            gbc.weightx = 0;
-            JLabel lblRole = new JLabel("Role:");
-            lblRole.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            fieldsPanel.add(lblRole, gbc);
-            gbc.gridx = 1;
-            gbc.weightx = 1.0;
-            cbRole = new JComboBox<>(new String[]{"USER", "ADMIN"});
-            cbRole.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-            cbRole.setPreferredSize(new Dimension(0, 32));
-            fieldsPanel.add(cbRole, gbc);
-
-            formPanel.add(fieldsPanel, BorderLayout.CENTER);
-
-            // Buttons panel - 3 nút: Thêm mới, Lưu, Xóa (ở dưới cùng)
-            JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 8));
+            // Nút chức năng - 4 nút: Thêm mới, Sửa, Xóa, Xem chi tiết
+            JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
             buttonsPanel.setBackground(new Color(245, 245, 245));
-            buttonsPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+            buttonsPanel.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
 
             btnAdd = new JButton("Thêm mới");
             btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            btnAdd.setPreferredSize(new Dimension(100, 38));
-            btnAdd.setBackground(new Color(0, 120, 215)); // Màu xanh
+            btnAdd.setPreferredSize(new Dimension(100, 35));
+            btnAdd.setBackground(new Color(0, 120, 215));
             btnAdd.setForeground(Color.WHITE);
             btnAdd.setFocusPainted(false);
             btnAdd.setBorderPainted(false);
 
-            btnSave = new JButton("Lưu");
-            btnSave.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            btnSave.setPreferredSize(new Dimension(100, 38));
-            btnSave.setBackground(new Color(0, 120, 215)); // Màu xanh dương
-            btnSave.setForeground(Color.WHITE);
-            btnSave.setFocusPainted(false);
-            btnSave.setBorderPainted(false);
-            btnSave.setEnabled(false); // Disable mặc định
+            btnEdit = new JButton("Sửa");
+            btnEdit.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            btnEdit.setPreferredSize(new Dimension(100, 35));
+            btnEdit.setBackground(new Color(0, 120, 215));
+            btnEdit.setForeground(Color.WHITE);
+            btnEdit.setFocusPainted(false);
+            btnEdit.setBorderPainted(false);
 
             btnDelete = new JButton("Xóa");
             btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            btnDelete.setPreferredSize(new Dimension(100, 38));
-            btnDelete.setBackground(new Color(200, 35, 51)); // Màu đỏ
+            btnDelete.setPreferredSize(new Dimension(100, 35));
+            btnDelete.setBackground(new Color(200, 35, 51));
             btnDelete.setForeground(Color.WHITE);
             btnDelete.setFocusPainted(false);
             btnDelete.setBorderPainted(false);
-            btnDelete.setEnabled(false); // Disable mặc định
+
+            btnViewDetail = new JButton("Xem chi tiết");
+            btnViewDetail.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            btnViewDetail.setPreferredSize(new Dimension(120, 35));
+            btnViewDetail.setBackground(new Color(0, 120, 215));
+            btnViewDetail.setForeground(Color.WHITE);
+            btnViewDetail.setFocusPainted(false);
+            btnViewDetail.setBorderPainted(false);
 
             buttonsPanel.add(btnAdd);
-            buttonsPanel.add(btnSave);
+            buttonsPanel.add(btnEdit);
             buttonsPanel.add(btnDelete);
+            buttonsPanel.add(btnViewDetail);
 
-            formPanel.add(buttonsPanel, BorderLayout.SOUTH);
-
-            // Layout chính với tỷ lệ 70% - 30%
-            JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollTable, formPanel);
-            splitPane.setDividerLocation(0.70); // 70% cho table, 30% cho form
-            splitPane.setDividerSize(6);
-            splitPane.setResizeWeight(0.70);
-            splitPane.setBorder(null);
-
-            add(splitPane, BorderLayout.CENTER);
+            add(buttonsPanel, BorderLayout.SOUTH);
 
             // Load dữ liệu ban đầu
             refreshUserList();
         }
 
         public void refreshUserList() {
-            int currentSelectedId = selectedUserId; // Lưu lại ID đang chọn
-            
             userTableModel.setRowCount(0);
             shopbancancau.dao.UserDAO userDAO = new shopbancancau.dao.UserDAO();
             java.util.List<shopbancancau.model.User> users = userDAO.getAllUsers();
-            int rowToSelect = -1;
             
-            for (int i = 0; i < users.size(); i++) {
-                shopbancancau.model.User user = users.get(i);
+            for (shopbancancau.model.User user : users) {
                 userTableModel.addRow(new Object[]{
                     user.getUserId(),
                     user.getUsername(),
                     user.getRole()
                 });
-                // Tìm lại dòng vừa chọn để select lại
-                if (currentSelectedId > 0 && user.getUserId() == currentSelectedId) {
-                    rowToSelect = i;
-                }
             }
-            
-            // Nếu có dòng đã chọn trước đó, select lại
-            if (rowToSelect >= 0) {
-                userTable.setRowSelectionInterval(rowToSelect, rowToSelect);
-                loadUserToForm(rowToSelect);
-            } else {
-                clearForm();
-            }
-        }
-
-        private void loadUserToForm(int row) {
-            if (row < 0 || row >= userTableModel.getRowCount()) return;
-            
-            selectedUserId = (Integer) userTableModel.getValueAt(row, 0);
-            String username = userTableModel.getValueAt(row, 1).toString();
-            String role = userTableModel.getValueAt(row, 2).toString();
-            
-            txtUsername.setText(username);
-            cbRole.setSelectedItem(role);
-            
-            // Username luôn editable
-            txtUsername.setEditable(true);
-            txtUsername.setBackground(Color.WHITE);
-            
-            // Role: disable nếu là tài khoản đang đăng nhập
-            boolean isCurrentUser = Session.currentUser != null && 
-                                    username.equals(Session.currentUser.getUsername());
-            cbRole.setEnabled(!isCurrentUser);
-            if (isCurrentUser) {
-                cbRole.setBackground(new Color(240, 240, 240));
-            } else {
-                cbRole.setBackground(Color.WHITE);
-            }
-            
-            updateButtonStates();
-        }
-
-        private void clearForm() {
-            selectedUserId = -1;
-            txtUsername.setText("");
-            cbRole.setSelectedIndex(0);
-            
-            // Enable khi thêm mới
-            txtUsername.setEditable(true);
-            txtUsername.setBackground(Color.WHITE);
-            cbRole.setEnabled(true);
-            cbRole.setBackground(Color.WHITE);
-            
-            userTable.clearSelection();
-            updateButtonStates();
-        }
-
-        private void updateButtonStates() {
-            boolean hasSelection = selectedUserId > 0;
-            boolean isAdmin = "ADMIN".equalsIgnoreCase(Session.currentUser != null ? Session.currentUser.getRole() : "");
-            boolean isCurrentUser = false;
-            
-            if (hasSelection && Session.currentUser != null) {
-                String selectedUsername = txtUsername.getText();
-                String currentUsername = Session.currentUser.getUsername();
-                isCurrentUser = selectedUsername.equals(currentUsername);
-            }
-            
-            // Nút Thêm mới: luôn enable nếu là ADMIN
-            btnAdd.setEnabled(isAdmin);
-            
-            // Nút Lưu: enable khi có selection và là ADMIN
-            btnSave.setEnabled(isAdmin && hasSelection);
-            
-            // Nút Xóa: chỉ enable khi có selection và không phải current user
-            btnDelete.setEnabled(isAdmin && hasSelection && !isCurrentUser);
         }
 
         public JButton getBtnAdd() { return btnAdd; }
-        public JButton getBtnSave() { return btnSave; }
+        public JButton getBtnEdit() { return btnEdit; }
         public JButton getBtnDelete() { return btnDelete; }
-        public int getSelectedUserId() { return selectedUserId; }
-        public String getUsername() { return txtUsername.getText().trim(); }
-        public String getRole() { return cbRole.getSelectedItem().toString(); }
+        public JButton getBtnViewDetail() { return btnViewDetail; }
+        public JTable getUserTable() { return userTable; }
+        public int getSelectedUserId() {
+            int selectedRow = userTable.getSelectedRow();
+            if (selectedRow >= 0) {
+                return (Integer) userTableModel.getValueAt(selectedRow, 0);
+            }
+            return -1;
+        }
         public DefaultTableModel getUserTableModel() { return userTableModel; }
         
         // Inner class cho popup tạo user mới

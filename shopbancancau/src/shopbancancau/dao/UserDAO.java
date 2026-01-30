@@ -1,6 +1,7 @@
 package shopbancancau.dao;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -9,6 +10,17 @@ import java.util.List;
 import shopbancancau.model.User;
 
 public class UserDAO {
+    
+    // Kiểm tra xem cột có tồn tại trong bảng không
+    private boolean columnExists(String tableName, String columnName) {
+        try (Connection conn = DBConnection.getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            ResultSet rs = metaData.getColumns(null, null, tableName, columnName);
+            return rs.next();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public User login(String username, String password) {
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
@@ -80,6 +92,37 @@ public class UserDAO {
         }
     }
 
+    public User getUserById(int userId) {
+        String sql = "SELECT * FROM users WHERE user_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setRole(rs.getString("role"));
+                // Thêm fullname và phone nếu có trong DB
+                try {
+                    user.setFullname(rs.getString("fullname"));
+                    user.setPhone(rs.getString("phone"));
+                } catch (Exception e) {
+                    // Nếu cột không tồn tại, để null
+                }
+                return user;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return null;
+    }
+
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM users ORDER BY user_id ASC";
@@ -111,21 +154,108 @@ public class UserDAO {
     }
 
     public void updateUser(int userId, String password, String fullname, String phone, String role) {
-        String sql = "UPDATE users SET password = ?, fullname = ?, phone = ?, role = ? WHERE user_id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, password);
-            ps.setString(2, fullname);
-            ps.setString(3, phone);
-            ps.setString(4, role);
-            ps.setInt(5, userId);
-
+        boolean hasFullname = columnExists("users", "fullname");
+        boolean hasPhone = columnExists("users", "phone");
+        
+        String sql;
+        PreparedStatement ps;
+        
+        try (Connection conn = DBConnection.getConnection()) {
+            if (hasFullname && hasPhone) {
+                // Cả hai cột đều tồn tại
+                sql = "UPDATE users SET password = ?, fullname = ?, phone = ?, role = ? WHERE user_id = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, password);
+                ps.setString(2, fullname);
+                ps.setString(3, phone);
+                ps.setString(4, role);
+                ps.setInt(5, userId);
+            } else if (hasFullname) {
+                // Chỉ có fullname
+                sql = "UPDATE users SET password = ?, fullname = ?, role = ? WHERE user_id = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, password);
+                ps.setString(2, fullname);
+                ps.setString(3, role);
+                ps.setInt(4, userId);
+            } else if (hasPhone) {
+                // Chỉ có phone
+                sql = "UPDATE users SET password = ?, phone = ?, role = ? WHERE user_id = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, password);
+                ps.setString(2, phone);
+                ps.setString(3, role);
+                ps.setInt(4, userId);
+            } else {
+                // Không có cả hai cột, chỉ update các cột cơ bản
+                sql = "UPDATE users SET password = ?, role = ? WHERE user_id = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, password);
+                ps.setString(2, role);
+                ps.setInt(3, userId);
+            }
+            
             ps.executeUpdate();
-
+            ps.close();
+            
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Lỗi khi cập nhật người dùng: " + e.getMessage(), e);
+        }
+    }
+
+    public void updateUser(int userId, String username, String password, String fullname, String phone, String role) {
+        boolean hasFullname = columnExists("users", "fullname");
+        boolean hasPhone = columnExists("users", "phone");
+        
+        String sql;
+        PreparedStatement ps;
+        
+        try (Connection conn = DBConnection.getConnection()) {
+            if (hasFullname && hasPhone) {
+                // Cả hai cột đều tồn tại
+                sql = "UPDATE users SET username = ?, password = ?, fullname = ?, phone = ?, role = ? WHERE user_id = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, fullname);
+                ps.setString(4, phone);
+                ps.setString(5, role);
+                ps.setInt(6, userId);
+            } else if (hasFullname) {
+                // Chỉ có fullname
+                sql = "UPDATE users SET username = ?, password = ?, fullname = ?, role = ? WHERE user_id = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, fullname);
+                ps.setString(4, role);
+                ps.setInt(5, userId);
+            } else if (hasPhone) {
+                // Chỉ có phone
+                sql = "UPDATE users SET username = ?, password = ?, phone = ?, role = ? WHERE user_id = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, phone);
+                ps.setString(4, role);
+                ps.setInt(5, userId);
+            } else {
+                // Không có cả hai cột, chỉ update các cột cơ bản
+                sql = "UPDATE users SET username = ?, password = ?, role = ? WHERE user_id = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, role);
+                ps.setInt(4, userId);
+            }
+            
+            ps.executeUpdate();
+            ps.close();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi cập nhật người dùng: " + e.getMessage(), e);
         }
     }
 

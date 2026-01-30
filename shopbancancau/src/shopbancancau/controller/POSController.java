@@ -5,8 +5,10 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.text.NumberFormat;
 import java.util.Locale;
+
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 import shopbancancau.dao.CustomerDAO;
 import shopbancancau.dao.DBConnection;
 import shopbancancau.dao.OrderDAO;
@@ -15,9 +17,11 @@ import shopbancancau.dao.UserDAO;
 import shopbancancau.model.Product;
 import shopbancancau.util.Session;
 import shopbancancau.view.CreateUserView;
+import shopbancancau.view.EditUserView;
+import shopbancancau.view.LoginView;
+import shopbancancau.view.UserDetailView;
 import shopbancancau.view.OrderHistoryView;
 import shopbancancau.view.POSView;
-import shopbancancau.view.LoginView;
 
 public class POSController {
     private POSView view;
@@ -244,118 +248,58 @@ public class POSController {
             popup.setVisible(true);
         });
         
-        // Nút Lưu - cập nhật username và role
-        userPanel.getBtnSave().addActionListener(e -> handleUpdateUser(userPanel));
+        // Nút Sửa - mở EditUserView
+        userPanel.getBtnEdit().addActionListener(e -> {
+            int userId = userPanel.getSelectedUserId();
+            if (userId <= 0) {
+                JOptionPane.showMessageDialog(view, "Vui lòng chọn người dùng để sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            EditUserView editView = new EditUserView(userId);
+            editView.setVisible(true);
+            // Refresh sau khi đóng form
+            editView.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    userPanel.refreshUserList();
+                }
+            });
+        });
         
         // Nút Xóa
         userPanel.getBtnDelete().addActionListener(e -> handleDeleteUser(userPanel));
-    }
-
-    private void handleUpdateUser(POSView.UserManagementPanel userPanel) {
-        int userId = userPanel.getSelectedUserId();
-        if (userId <= 0) {
-            JOptionPane.showMessageDialog(view, "Vui lòng chọn tài khoản cần cập nhật");
-            return;
-        }
-
-        // Kiểm tra quyền ADMIN
-        if (!"ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
-            JOptionPane.showMessageDialog(view, "Chỉ ADMIN mới có quyền cập nhật tài khoản");
-            return;
-        }
-
-        String newUsername = userPanel.getUsername().trim();
-        String newRole = userPanel.getRole();
         
-        if (newUsername.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Username không được để trống");
-            return;
-        }
-
-        // Lấy username cũ từ table để so sánh
-        String oldUsername = "";
-        DefaultTableModel model = userPanel.getUserTableModel();
-        for (int i = 0; i < model.getRowCount(); i++) {
-            if ((Integer) model.getValueAt(i, 0) == userId) {
-                oldUsername = model.getValueAt(i, 1).toString();
-                break;
+        // Nút Xem chi tiết - mở UserDetailView
+        userPanel.getBtnViewDetail().addActionListener(e -> {
+            int userId = userPanel.getSelectedUserId();
+            if (userId <= 0) {
+                JOptionPane.showMessageDialog(view, "Vui lòng chọn người dùng để xem chi tiết!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-        }
-
-        UserDAO userDAO = new UserDAO();
-        
-        // Kiểm tra username trùng (trừ chính nó)
-        if (!newUsername.equals(oldUsername) && userDAO.usernameExistsExcept(newUsername, userId)) {
-            JOptionPane.showMessageDialog(view, "Username đã tồn tại! Vui lòng chọn username khác.");
-            return;
-        }
-
-        // Kiểm tra nếu là tài khoản đang đăng nhập thì không cho đổi role
-        boolean isCurrentUser = Session.currentUser != null && 
-                                oldUsername.equals(Session.currentUser.getUsername());
-        if (isCurrentUser) {
-            // Nếu là current user, giữ nguyên role cũ
-            newRole = Session.currentUser.getRole();
-        }
-
-        String confirmMessage = "Bạn có chắc chắn muốn cập nhật tài khoản này?";
-        if (!newUsername.equals(oldUsername)) {
-            confirmMessage += "\nUsername: \"" + oldUsername + "\" → \"" + newUsername + "\"";
-        }
-        if (!isCurrentUser && !newRole.equals(getRoleFromTable(model, userId))) {
-            confirmMessage += "\nRole: \"" + getRoleFromTable(model, userId) + "\" → \"" + newRole + "\"";
-        }
-
-        int confirm = JOptionPane.showOptionDialog(
-            view,
-            confirmMessage,
-            "Xác nhận cập nhật",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            new Object[]{"Có", "Không"},
-            "Có"
-        );
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            try {
-                userDAO.updateUser(userId, newUsername, newRole);
-                
-                // Nếu sửa username của tài khoản đang đăng nhập, cập nhật Session
-                if (isCurrentUser && !newUsername.equals(oldUsername)) {
-                    Session.currentUser.setUsername(newUsername);
-                }
-                
-                JOptionPane.showMessageDialog(view, "Cập nhật tài khoản thành công");
-                userPanel.refreshUserList();
-            } catch (Exception e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(view, "Lỗi khi cập nhật tài khoản: " + e.getMessage());
-            }
-        }
+            UserDetailView detailView = new UserDetailView(userId);
+            detailView.setVisible(true);
+        });
     }
-    
-    private String getRoleFromTable(DefaultTableModel model, int userId) {
-        for (int i = 0; i < model.getRowCount(); i++) {
-            if ((Integer) model.getValueAt(i, 0) == userId) {
-                return model.getValueAt(i, 2).toString();
-            }
-        }
-        return "";
-    }
+
 
     private void handleDeleteUser(POSView.UserManagementPanel userPanel) {
         int userId = userPanel.getSelectedUserId();
         if (userId <= 0) {
-            JOptionPane.showMessageDialog(view, "Vui lòng chọn tài khoản cần xóa");
+            JOptionPane.showMessageDialog(view, "Vui lòng chọn tài khoản cần xóa", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String username = userPanel.getUsername();
+        // Lấy username từ table
+        String username = "";
+        DefaultTableModel model = userPanel.getUserTableModel();
+        int selectedRow = userPanel.getUserTable().getSelectedRow();
+        if (selectedRow >= 0) {
+            username = model.getValueAt(selectedRow, 1).toString();
+        }
         
         // Kiểm tra không cho phép xóa chính tài khoản đang đăng nhập
         if (Session.currentUser != null && username.equals(Session.currentUser.getUsername())) {
-            JOptionPane.showMessageDialog(view, "Không thể xóa chính tài khoản đang đăng nhập");
+            JOptionPane.showMessageDialog(view, "Không thể xóa chính tài khoản đang đăng nhập", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
