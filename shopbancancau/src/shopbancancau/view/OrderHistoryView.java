@@ -8,6 +8,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Calendar;
 import java.util.Date;
+import shopbancancau.util.Session;
 
 public class OrderHistoryView extends JFrame {
 
@@ -34,7 +35,12 @@ public class OrderHistoryView extends JFrame {
     }
     
     private void initComponents() {
-        setTitle("Thống kê");
+        // Đặt title dựa trên role: ADMIN = "Thống kê", USER = "Lịch sử hóa đơn"
+        String title = "Lịch sử hóa đơn";
+        if (Session.currentUser != null && "ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
+            title = "Thống kê";
+        }
+        setTitle(title);
         setSize(750, 420);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(parentView != null ? JFrame.DO_NOTHING_ON_CLOSE : JFrame.DISPOSE_ON_CLOSE);
@@ -172,7 +178,7 @@ public class OrderHistoryView extends JFrame {
         add(northContainer, BorderLayout.NORTH);
 
         // ===== TABLE =====
-        String[] cols = {"Mã hóa đơn", "Ngày", "Tổng tiền"};
+        String[] cols = {"Mã hóa đơn", "Ngày", "Tên người đặt", "SĐT người đặt", "Tổng tiền"};
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
@@ -181,6 +187,15 @@ public class OrderHistoryView extends JFrame {
         };
 
         table = new JTable(tableModel);
+        // Điều chỉnh độ rộng cột
+        table.getColumnModel().getColumn(0).setPreferredWidth(80);  // Mã hóa đơn
+        table.getColumnModel().getColumn(1).setPreferredWidth(150);  // Ngày
+        table.getColumnModel().getColumn(2).setPreferredWidth(150);   // Tên người đặt
+        table.getColumnModel().getColumn(3).setPreferredWidth(120);  // SĐT người đặt
+        table.getColumnModel().getColumn(4).setPreferredWidth(120);   // Tổng tiền
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.setRowHeight(25);
+        
         JScrollPane scroll = new JScrollPane(table);
         add(scroll, BorderLayout.CENTER);
 

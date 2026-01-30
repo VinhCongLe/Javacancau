@@ -9,7 +9,7 @@ public class DBConnection {
         "jdbc:mysql://localhost:3306/shopbancancau?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root";
     private static final String PASSWORD = "123456";
-    //private static final String PASSWORD = ""; Vinh
+    //private static final String PASSWORD = ""; //Vinh
 
     public static Connection getConnection() {
         try {

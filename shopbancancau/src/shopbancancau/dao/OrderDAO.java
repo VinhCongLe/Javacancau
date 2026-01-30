@@ -60,22 +60,27 @@ public class OrderDAO {
         }
     }
 
-    // 4️⃣ Lấy tất cả hóa đơn (sửa để dùng try-with-resources, an toàn hơn)
+    // 4️⃣ Lấy tất cả hóa đơn (JOIN với customers để lấy tên và SĐT)
     public ResultSet getAllOrders() throws SQLException {
-        String sql = "SELECT order_id, order_date, total_amount " +
-                     "FROM orders ORDER BY order_id DESC";
+        String sql = "SELECT o.order_id, o.order_date, o.total_amount, " +
+                     "c.name AS customer_name, c.phone AS customer_phone " +
+                     "FROM orders o " +
+                     "LEFT JOIN customers c ON o.customer_id = c.customer_id " +
+                     "ORDER BY o.order_id DESC";
 
         Connection conn = DBConnection.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
         return ps.executeQuery();  // Caller phải close ResultSet + Statement + Connection
     }
 
-    // 5️⃣ Lọc hóa đơn theo khoảng ngày (sửa để xử lý Date → Timestamp đúng)
+    // 5️⃣ Lọc hóa đơn theo khoảng ngày (JOIN với customers để lấy tên và SĐT)
     public ResultSet getOrdersByDate(Date fromDate, Date toDate) throws SQLException {
-        String sql = "SELECT order_id, order_date, total_amount " +
-                     "FROM orders " +
-                     "WHERE order_date BETWEEN ? AND ? " +
-                     "ORDER BY order_id DESC";
+        String sql = "SELECT o.order_id, o.order_date, o.total_amount, " +
+                     "c.name AS customer_name, c.phone AS customer_phone " +
+                     "FROM orders o " +
+                     "LEFT JOIN customers c ON o.customer_id = c.customer_id " +
+                     "WHERE o.order_date BETWEEN ? AND ? " +
+                     "ORDER BY o.order_id DESC";
 
         Connection conn = DBConnection.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
@@ -90,7 +95,44 @@ public class OrderDAO {
         return ps.executeQuery();
     }
 
-    // 6️⃣ Lấy chi tiết hóa đơn theo order_id
+    // 6️⃣ Lấy tất cả hóa đơn của một user cụ thể (JOIN với customers để lấy tên và SĐT)
+    public ResultSet getOrdersByUserId(int userId) throws SQLException {
+        String sql = "SELECT o.order_id, o.order_date, o.total_amount, " +
+                     "c.name AS customer_name, c.phone AS customer_phone " +
+                     "FROM orders o " +
+                     "LEFT JOIN customers c ON o.customer_id = c.customer_id " +
+                     "WHERE o.user_id = ? " +
+                     "ORDER BY o.order_id DESC";
+
+        Connection conn = DBConnection.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, userId);
+        return ps.executeQuery();
+    }
+
+    // 7️⃣ Lọc hóa đơn của một user theo khoảng ngày (JOIN với customers để lấy tên và SĐT)
+    public ResultSet getOrdersByUserIdAndDate(int userId, Date fromDate, Date toDate) throws SQLException {
+        String sql = "SELECT o.order_id, o.order_date, o.total_amount, " +
+                     "c.name AS customer_name, c.phone AS customer_phone " +
+                     "FROM orders o " +
+                     "LEFT JOIN customers c ON o.customer_id = c.customer_id " +
+                     "WHERE o.user_id = ? AND o.order_date BETWEEN ? AND ? " +
+                     "ORDER BY o.order_id DESC";
+
+        Connection conn = DBConnection.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql);
+
+        ps.setInt(1, userId);
+        Timestamp fromTs = new Timestamp(fromDate.getTime());
+        Timestamp toTs = new Timestamp(toDate.getTime() + (24 * 60 * 60 * 1000 - 1));
+
+        ps.setTimestamp(2, fromTs);
+        ps.setTimestamp(3, toTs);
+
+        return ps.executeQuery();
+    }
+
+    // 8️⃣ Lấy chi tiết hóa đơn theo order_id
     public ResultSet getOrderDetails(int orderId) throws SQLException {
         String sql = "SELECT p.product_name, od.quantity, od.price, " +
                      "(od.quantity * od.price) AS total " +

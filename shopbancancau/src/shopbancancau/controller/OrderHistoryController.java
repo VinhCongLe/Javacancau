@@ -3,6 +3,7 @@ package shopbancancau.controller;
 import shopbancancau.dao.OrderDAO;
 import shopbancancau.view.OrderHistoryView;
 import shopbancancau.view.OrderDetailView;
+import shopbancancau.util.Session;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -30,10 +31,21 @@ public class OrderHistoryController {
         view.addFilterListener(e -> filterByDate());
     }
 
-    // ===== LOAD TẤT CẢ =====
+    // ===== LOAD ĐƠN HÀNG (PHÂN QUYỀN) =====
     private void loadOrders() {
         try {
-            ResultSet rs = orderDAO.getAllOrders();
+            ResultSet rs;
+            
+            // Kiểm tra role: ADMIN xem tất cả, USER chỉ xem đơn của mình
+            if (Session.currentUser != null && "ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
+                // ADMIN: hiển thị tất cả đơn hàng
+                rs = orderDAO.getAllOrders();
+            } else {
+                // USER: chỉ hiển thị đơn hàng của mình
+                int userId = Session.currentUser != null ? Session.currentUser.getUserId() : 0;
+                rs = orderDAO.getOrdersByUserId(userId);
+            }
+            
             DefaultTableModel model = view.getTableModel();
             model.setRowCount(0);
 
@@ -43,9 +55,17 @@ public class OrderHistoryController {
                 double total = rs.getDouble("total_amount");
                 totalSum += total;
 
+                // Lấy tên và SĐT khách hàng (có thể null nếu LEFT JOIN không match)
+                String customerName = rs.getString("customer_name");
+                String customerPhone = rs.getString("customer_phone");
+                if (customerName == null) customerName = "";
+                if (customerPhone == null) customerPhone = "";
+
                 model.addRow(new Object[]{
                         rs.getInt("order_id"),
                         rs.getTimestamp("order_date"),
+                        customerName,
+                        customerPhone,
                         moneyFormat.format(total) + " đ"
                 });
             }
@@ -97,7 +117,17 @@ public class OrderHistoryController {
             cal.set(Calendar.MILLISECOND, 999);
             Date toDate = new Date(cal.getTimeInMillis());
 
-            ResultSet rs = orderDAO.getOrdersByDate(fromDate, toDate);
+            ResultSet rs;
+            
+            // Kiểm tra role: ADMIN xem tất cả, USER chỉ xem đơn của mình
+            if (Session.currentUser != null && "ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
+                // ADMIN: lọc tất cả đơn hàng theo ngày
+                rs = orderDAO.getOrdersByDate(fromDate, toDate);
+            } else {
+                // USER: chỉ lọc đơn hàng của mình theo ngày
+                int userId = Session.currentUser != null ? Session.currentUser.getUserId() : 0;
+                rs = orderDAO.getOrdersByUserIdAndDate(userId, fromDate, toDate);
+            }
 
             DefaultTableModel model = view.getTableModel();
             model.setRowCount(0);
@@ -108,9 +138,17 @@ public class OrderHistoryController {
                 double total = rs.getDouble("total_amount");
                 totalSum += total;
 
+                // Lấy tên và SĐT khách hàng (có thể null nếu LEFT JOIN không match)
+                String customerName = rs.getString("customer_name");
+                String customerPhone = rs.getString("customer_phone");
+                if (customerName == null) customerName = "";
+                if (customerPhone == null) customerPhone = "";
+
                 model.addRow(new Object[]{
                         rs.getInt("order_id"),
                         rs.getTimestamp("order_date"),
+                        customerName,
+                        customerPhone,
                         moneyFormat.format(total) + " đ"
                 });
             }
