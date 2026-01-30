@@ -30,6 +30,7 @@ public class OrderHistoryController {
         view.addDetailListener(e -> showDetail());
         view.addDeleteListener(e -> deleteOrder());
         view.addFilterListener(e -> filterByDate());
+        view.addRefreshListener(e -> loadOrders());
     }
 
     // ===== LOAD ĐƠN HÀNG (PHÂN QUYỀN) =====

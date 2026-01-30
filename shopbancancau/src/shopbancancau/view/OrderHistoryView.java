@@ -17,6 +17,7 @@ public class OrderHistoryView extends JFrame {
     private JButton btnDetail;
     private JButton btnDelete;
     private JButton btnFilter;
+    private JButton btnRefresh;
     private JButton btnBack;
 
     private JSpinner spinnerFromDate;
@@ -172,6 +173,16 @@ public class OrderHistoryView extends JFrame {
         btnFilter.setBorderPainted(false);
         filterPanel.add(btnFilter);
         
+        // Nút Làm mới
+        btnRefresh = new JButton("Làm mới");
+        btnRefresh.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnRefresh.setPreferredSize(new Dimension(100, 30));
+        btnRefresh.setBackground(new Color(40, 167, 69)); // Màu xanh lá
+        btnRefresh.setForeground(Color.WHITE);
+        btnRefresh.setFocusPainted(false);
+        btnRefresh.setBorderPainted(false);
+        filterPanel.add(btnRefresh);
+        
         // Khởi tạo trạng thái nút Lọc
         updateFilterButtonState();
 
@@ -283,6 +294,10 @@ public class OrderHistoryView extends JFrame {
 
     public void addFilterListener(ActionListener l) {
         btnFilter.addActionListener(l);
+    }
+    
+    public void addRefreshListener(ActionListener l) {
+        btnRefresh.addActionListener(l);
     }
 
     // ===== TOTAL LABEL =====
