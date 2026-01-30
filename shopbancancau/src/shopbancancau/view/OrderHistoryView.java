@@ -15,6 +15,7 @@ public class OrderHistoryView extends JFrame {
     private JTable table;
     private DefaultTableModel tableModel;
     private JButton btnDetail;
+    private JButton btnDelete;
     private JButton btnFilter;
     private JButton btnBack;
 
@@ -206,8 +207,28 @@ public class OrderHistoryView extends JFrame {
         lblTotal.setFont(new Font("Arial", Font.BOLD, 14));
         bottomPanel.add(lblTotal, BorderLayout.WEST);
 
+        // Panel chứa các nút bên phải
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        
+        btnDelete = new JButton("Xóa");
+        btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnDelete.setPreferredSize(new Dimension(100, 35));
+        btnDelete.setBackground(new Color(220, 53, 69)); // Màu đỏ
+        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setFocusPainted(false);
+        btnDelete.setBorderPainted(false);
+        buttonPanel.add(btnDelete);
+        
         btnDetail = new JButton("Xem chi tiết");
-        bottomPanel.add(btnDetail, BorderLayout.EAST);
+        btnDetail.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnDetail.setPreferredSize(new Dimension(120, 35));
+        btnDetail.setBackground(new Color(0, 120, 215)); // Màu xanh
+        btnDetail.setForeground(Color.WHITE);
+        btnDetail.setFocusPainted(false);
+        btnDetail.setBorderPainted(false);
+        buttonPanel.add(btnDetail);
+        
+        bottomPanel.add(buttonPanel, BorderLayout.EAST);
 
         add(bottomPanel, BorderLayout.SOUTH);
     }
@@ -223,6 +244,10 @@ public class OrderHistoryView extends JFrame {
 
     public void addDetailListener(ActionListener l) {
         btnDetail.addActionListener(l);
+    }
+    
+    public void addDeleteListener(ActionListener l) {
+        btnDelete.addActionListener(l);
     }
 
     // ===== FILTER SUPPORT =====

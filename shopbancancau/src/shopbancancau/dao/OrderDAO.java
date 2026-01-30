@@ -145,4 +145,45 @@ public class OrderDAO {
         ps.setInt(1, orderId);
         return ps.executeQuery();
     }
+
+    // 9️⃣ Xóa đơn hàng (xóa order_details trước, sau đó xóa order)
+    public boolean deleteOrder(int orderId) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); // Bắt đầu transaction
+
+            // Xóa order_details trước (do foreign key constraint)
+            String sqlDeleteDetails = "DELETE FROM order_details WHERE order_id = ?";
+            try (PreparedStatement psDetails = conn.prepareStatement(sqlDeleteDetails)) {
+                psDetails.setInt(1, orderId);
+                psDetails.executeUpdate();
+            }
+
+            // Xóa order
+            String sqlDeleteOrder = "DELETE FROM orders WHERE order_id = ?";
+            try (PreparedStatement psOrder = conn.prepareStatement(sqlDeleteOrder)) {
+                psOrder.setInt(1, orderId);
+                int rowsAffected = psOrder.executeUpdate();
+                
+                if (rowsAffected > 0) {
+                    conn.commit(); // Commit transaction nếu thành công
+                    return true;
+                } else {
+                    conn.rollback(); // Rollback nếu không có dòng nào bị xóa
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            if (conn != null) {
+                conn.rollback(); // Rollback nếu có lỗi
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true); // Khôi phục auto-commit
+                conn.close();
+            }
+        }
+    }
 }

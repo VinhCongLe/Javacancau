@@ -28,6 +28,7 @@ public class OrderHistoryController {
         loadOrders();
 
         view.addDetailListener(e -> showDetail());
+        view.addDeleteListener(e -> deleteOrder());
         view.addFilterListener(e -> filterByDate());
     }
 
@@ -179,5 +180,74 @@ public class OrderHistoryController {
         OrderDetailView detailView = new OrderDetailView(orderId);
         new OrderDetailController(detailView, orderId);
         detailView.setVisible(true);
+    }
+
+    // ===== XÓA ĐƠN HÀNG =====
+    private void deleteOrder() {
+        int row = view.getTable().getSelectedRow();
+
+        if (row == -1) {
+            JOptionPane.showMessageDialog(view,
+                    "Vui lòng chọn một hóa đơn để xóa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int orderId = (int) view.getTableModel().getValueAt(row, 0);
+        String orderDate = view.getTableModel().getValueAt(row, 1).toString();
+        String customerName = view.getTableModel().getValueAt(row, 2).toString();
+        String totalAmount = view.getTableModel().getValueAt(row, 4).toString();
+
+        // Hiển thị dialog xác nhận
+        String message = String.format(
+            "Bạn có chắc chắn muốn xóa đơn hàng này?\n\n" +
+            "Mã hóa đơn: %d\n" +
+            "Ngày: %s\n" +
+            "Khách hàng: %s\n" +
+            "Tổng tiền: %s",
+            orderId, orderDate, customerName, totalAmount
+        );
+
+        int confirm = JOptionPane.showConfirmDialog(
+            view,
+            message,
+            "Xác nhận xóa đơn hàng",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                boolean success = orderDAO.deleteOrder(orderId);
+                
+                if (success) {
+                    JOptionPane.showMessageDialog(
+                        view,
+                        "Xóa đơn hàng thành công!",
+                        "Thành công",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    
+                    // Reload lại danh sách đơn hàng
+                    loadOrders();
+                } else {
+                    JOptionPane.showMessageDialog(
+                        view,
+                        "Không thể xóa đơn hàng. Đơn hàng có thể không tồn tại.",
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(
+                    view,
+                    "Lỗi khi xóa đơn hàng: " + e.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
     }
 }
