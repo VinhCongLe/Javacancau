@@ -39,18 +39,18 @@ public class EditUserView extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(245, 245, 245));
 
-        // Title
+        
         JLabel lblTitle = new JLabel("Sửa thông tin người dùng", JLabel.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(20, 10, 15, 10));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Panel chính
+       
         JPanel mainPanel = new JPanel(new BorderLayout(15, 15));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
         mainPanel.setBackground(new Color(245, 245, 245));
 
-        // Form panel
+        
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         formPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -65,7 +65,7 @@ public class EditUserView extends JFrame {
 
         int row = 0;
 
-        // Username
+        
         gbc.gridy = row++;
         gbc.gridx = 0;
         gbc.weightx = 0.0;
@@ -81,7 +81,7 @@ public class EditUserView extends JFrame {
         txtUsername.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtUsername, gbc);
 
-        // Password
+        
         gbc.gridy = row++;
         gbc.gridx = 0;
         gbc.weightx = 0.0;
@@ -97,7 +97,7 @@ public class EditUserView extends JFrame {
         txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtPassword, gbc);
 
-        // Role
+        
         gbc.gridy = row++;
         gbc.gridx = 0;
         gbc.weightx = 0.0;
@@ -113,7 +113,7 @@ public class EditUserView extends JFrame {
         cbRole.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(cbRole, gbc);
 
-        // Fullname
+        
         gbc.gridy = row++;
         gbc.gridx = 0;
         gbc.weightx = 0.0;
@@ -129,7 +129,7 @@ public class EditUserView extends JFrame {
         txtFullname.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtFullname, gbc);
 
-        // Phone
+      
         gbc.gridy = row++;
         gbc.gridx = 0;
         gbc.weightx = 0.0;
@@ -147,7 +147,7 @@ public class EditUserView extends JFrame {
 
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        // Nút Lưu và Đóng
+    
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         buttonPanel.setBackground(new Color(245, 245, 245));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -186,12 +186,12 @@ public class EditUserView extends JFrame {
             return;
         }
 
-        // Điền dữ liệu vào form
+       
         txtUsername.setText(user.getUsername() != null ? user.getUsername() : "");
         txtFullname.setText(user.getFullname() != null ? user.getFullname() : "");
         txtPhone.setText(user.getPhone() != null ? user.getPhone() : "");
         cbRole.setSelectedItem(user.getRole() != null ? user.getRole() : "USER");
-        // Không điền password vì đây là mật khẩu mới
+        
     }
 
     private void saveUser() {
@@ -207,7 +207,7 @@ public class EditUserView extends JFrame {
                 return;
             }
 
-            // Kiểm tra username trùng (trừ chính nó)
+            
             User oldUser = userDAO.getUserById(userId);
             if (oldUser == null) {
                 JOptionPane.showMessageDialog(this, "Không tìm thấy người dùng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -220,7 +220,7 @@ public class EditUserView extends JFrame {
                 return;
             }
 
-            // Nếu không nhập password mới, giữ nguyên password cũ
+            
             if (password.isEmpty()) {
                 password = oldUser.getPassword();
             }
@@ -228,12 +228,12 @@ public class EditUserView extends JFrame {
             userDAO.updateUser(userId, username, password, fullname, phone, role);
             JOptionPane.showMessageDialog(this, "Cập nhật thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
             
-            // Refresh parent view nếu có
+            
             if (parentView != null) {
                 parentView.refreshUsers();
             }
             
-            dispose(); // Đóng form sau khi lưu thành công
+            dispose(); 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }

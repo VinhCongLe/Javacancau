@@ -27,13 +27,13 @@ public class ProductListView extends JFrame {
 
     private void initComponents() {
         setTitle("Quản lý sản phẩm - Phụ kiện câu cá");
-        setSize(1000, 500);           // Giảm chiều cao vì không còn form thông tin
+        setSize(1000, 500);          
         setMinimumSize(new Dimension(900, 400));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(5, 5));
         
-        // Window listener: dispose and show parent POSView
+       
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -46,15 +46,14 @@ public class ProductListView extends JFrame {
             }
         });
         
-        // Nút Quay lại ở góc trên trái
+    
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         topPanel.setBackground(new Color(245, 245, 245));
         topPanel.setOpaque(false);
         btnBack = new JButton("← Quay lại");
         btnBack.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnBack.setPreferredSize(new Dimension(120, 35));
-        btnBack.setBackground(new Color(0, 120, 215)); // Màu xanh
-        btnBack.setForeground(Color.WHITE);
+        btnBack.setBackground(new Color(0, 120, 215)); 
         btnBack.setFocusPainted(false);
         btnBack.setBorderPainted(false);
         btnBack.addActionListener(e -> {
@@ -68,7 +67,7 @@ public class ProductListView extends JFrame {
         topPanel.add(btnBack);
         add(topPanel, BorderLayout.NORTH);
 
-        // ------------------- Bảng danh sách -------------------
+       
         String[] columns = {"ID", "Tên sản phẩm", "Giá bán", "Tồn kho", "Loại", "Mô tả", "Nhà cung cấp", "Ảnh"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -88,13 +87,13 @@ public class ProductListView extends JFrame {
         table.getColumnModel().getColumn(7).setPreferredWidth(130);
 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.setRowHeight(30); // Tăng từ 28 lên 30 để dễ đọc hơn
+        table.setRowHeight(30); 
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Danh sách sản phẩm"));
         add(scrollPane, BorderLayout.CENTER);
 
-        // Nút chức năng
+      
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 6));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         btnAdd = new JButton("Thêm mới");

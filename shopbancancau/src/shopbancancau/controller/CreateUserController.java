@@ -38,7 +38,7 @@ public class CreateUserController {
         userDAO.createUser(username, password, role);
         JOptionPane.showMessageDialog(view, "Tạo tài khoản thành công");
         
-        // Refresh parent view nếu có
+        
         if (parentView != null) {
             parentView.refreshUsers();
         }

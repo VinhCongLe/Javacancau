@@ -35,27 +35,27 @@ public class POSController {
         this.productDAO = new ProductDAO();
         this.customerDAO = new CustomerDAO();
 
-        // CHẮN SESSION
+        
         if (Session.currentUser == null) {
             JOptionPane.showMessageDialog(view, "Vui lòng đăng nhập!");
             view.dispose();
             return;
         }
 
-        // PHÂN QUYỀN MENU – CHỈ ẨN "Quản lý tài khoản" nếu KHÔNG PHẢI ADMIN
+       
         if (!"ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
             view.getMenuCreateUser().setVisible(false);
-            // KHÔNG ẨN menuOrderHistory → user thường VẪN THẤY "Lịch sử hóa đơn"
+            
             view.getMenuOrderHistory().setVisible(true);
         } else {
-            // ADMIN thấy cả 2
+           
             view.getMenuCreateUser().setVisible(true);
             view.getMenuOrderHistory().setVisible(true);
         }
 
         loadProducts();
 
-        // Gắn sự kiện
+        
         view.addAddListener(new AddHandler());
         view.addPayListener(new PayHandler());
         view.getBtnRemove().addActionListener(e -> removeItem());
@@ -64,11 +64,11 @@ public class POSController {
 
         view.getMenuLogout().addActionListener(e -> logout());
         
-        // Gắn sự kiện cho UserManagementPanel
+      
         setupUserManagementHandlers();
     }
 
-    /* ================== ĐĂNG XUẤT ================== */
+    
     private void logout() {
         int confirm = JOptionPane.showOptionDialog(
             view,
@@ -91,7 +91,7 @@ public class POSController {
         }
     }
 
-    // Các phần còn lại giữ nguyên (loadProducts, AddHandler, removeItem, PayHandler, updateTotal, formatMoney, openOrderHistory, openCreateUser)
+   
     private void loadProducts() {
         view.getCbProduct().removeAllItems();
         for (Product p : productDAO.getAllProducts()) {
@@ -224,7 +224,7 @@ public class POSController {
     private void openOrderHistory() {
         OrderHistoryView v = new OrderHistoryView(view);
         new OrderHistoryController(v);
-        view.setVisible(false); // Hide POSView when opening OrderHistoryView
+        view.setVisible(false); 
         v.setVisible(true);
     }
 
@@ -241,14 +241,14 @@ public class POSController {
     private void setupUserManagementHandlers() {
         POSView.UserManagementPanel userPanel = view.getUserManagementPanel();
         
-        // Nút Thêm mới - mở popup
+        
         userPanel.getBtnAdd().addActionListener(e -> {
             POSView.UserManagementPanel.CreateUserPopup popup = 
                 userPanel.new CreateUserPopup(userPanel);
             popup.setVisible(true);
         });
         
-        // Nút Sửa - mở EditUserView
+        
         userPanel.getBtnEdit().addActionListener(e -> {
             int userId = userPanel.getSelectedUserId();
             if (userId <= 0) {
@@ -257,7 +257,7 @@ public class POSController {
             }
             EditUserView editView = new EditUserView(userId);
             editView.setVisible(true);
-            // Refresh sau khi đóng form
+           
             editView.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosed(java.awt.event.WindowEvent e) {
@@ -266,10 +266,10 @@ public class POSController {
             });
         });
         
-        // Nút Xóa
+        
         userPanel.getBtnDelete().addActionListener(e -> handleDeleteUser(userPanel));
         
-        // Nút Xem chi tiết - mở UserDetailView
+        
         userPanel.getBtnViewDetail().addActionListener(e -> {
             int userId = userPanel.getSelectedUserId();
             if (userId <= 0) {
@@ -289,7 +289,7 @@ public class POSController {
             return;
         }
 
-        // Lấy username từ table
+       
         String username = "";
         DefaultTableModel model = userPanel.getUserTableModel();
         int selectedRow = userPanel.getUserTable().getSelectedRow();
@@ -297,7 +297,7 @@ public class POSController {
             username = model.getValueAt(selectedRow, 1).toString();
         }
         
-        // Kiểm tra không cho phép xóa chính tài khoản đang đăng nhập
+        
         if (Session.currentUser != null && username.equals(Session.currentUser.getUsername())) {
             JOptionPane.showMessageDialog(view, "Không thể xóa chính tài khoản đang đăng nhập", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;

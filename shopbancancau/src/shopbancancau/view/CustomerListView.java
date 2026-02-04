@@ -27,13 +27,13 @@ public class CustomerListView extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(245, 245, 245));
 
-        // Title
+       
         JLabel lblTitle = new JLabel("Danh sách khách hàng", JLabel.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Table
+       
         String[] columns = {"ID", "Tên khách hàng", "Số điện thoại"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -53,7 +53,7 @@ public class CustomerListView extends JFrame {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Danh sách khách hàng"));
         add(scrollPane, BorderLayout.CENTER);
 
-        // Nút Thêm khách hàng
+     
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(245, 245, 245));
         JButton btnAddCustomer = new JButton("Thêm khách hàng");

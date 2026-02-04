@@ -24,7 +24,7 @@ public class UserDetailView extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(245, 245, 245));
 
-        // Load người dùng từ database
+      
         User user = userDAO.getUserById(userId);
         if (user == null) {
             JOptionPane.showMessageDialog(this, "Không tìm thấy người dùng với ID: " + userId, 
@@ -33,18 +33,18 @@ public class UserDetailView extends JFrame {
             return;
         }
 
-        // Title
+      
         JLabel lblTitle = new JLabel("Chi tiết người dùng", JLabel.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Panel chính chứa thông tin
+     
         JPanel mainPanel = new JPanel(new BorderLayout(15, 15));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         mainPanel.setBackground(new Color(245, 245, 245));
 
-        // Panel thông tin
+        
         JPanel infoPanel = new JPanel(new GridBagLayout());
         infoPanel.setBackground(Color.WHITE);
         infoPanel.setBorder(BorderFactory.createTitledBorder("Thông tin người dùng"));
@@ -53,7 +53,7 @@ public class UserDetailView extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // ID người dùng
+      
         gbc.gridx = 0; gbc.gridy = 0;
         infoPanel.add(new JLabel("ID:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -61,7 +61,7 @@ public class UserDetailView extends JFrame {
         lblUserId.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         infoPanel.add(lblUserId, gbc);
 
-        // Username
+        
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
         infoPanel.add(new JLabel("Username:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -69,7 +69,7 @@ public class UserDetailView extends JFrame {
         lblUsername.setFont(new Font("Segoe UI", Font.BOLD, 14));
         infoPanel.add(lblUsername, gbc);
 
-        // Role
+      
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0;
         infoPanel.add(new JLabel("Vai trò:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -78,7 +78,7 @@ public class UserDetailView extends JFrame {
         lblRole.setForeground(new Color(220, 20, 60));
         infoPanel.add(lblRole, gbc);
 
-        // Fullname
+     
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0;
         infoPanel.add(new JLabel("Họ tên:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -86,7 +86,7 @@ public class UserDetailView extends JFrame {
         lblFullname.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         infoPanel.add(lblFullname, gbc);
 
-        // Phone
+     
         gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0;
         infoPanel.add(new JLabel("Số điện thoại:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -96,7 +96,7 @@ public class UserDetailView extends JFrame {
 
         mainPanel.add(infoPanel, BorderLayout.CENTER);
 
-        // Nút Đóng
+    
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(245, 245, 245));
         JButton btnClose = new JButton("Đóng");

@@ -24,7 +24,7 @@ public class ProductController {
     public void addProduct(Product product) {
         if (productDAO.addProduct(product)) {
             JOptionPane.showMessageDialog(view, "Thêm sản phẩm thành công!");
-            loadAllProducts(); // refresh bảng
+            loadAllProducts(); 
         } else {
             JOptionPane.showMessageDialog(view, "Thêm thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }

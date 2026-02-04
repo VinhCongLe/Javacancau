@@ -43,18 +43,18 @@ public class EditProductView extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(245, 245, 245));
 
-        // Title
+        
         JLabel lblTitle = new JLabel("Sửa thông tin sản phẩm", JLabel.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Panel chính
+     
         JPanel mainPanel = new JPanel(new BorderLayout(15, 15));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         mainPanel.setBackground(new Color(245, 245, 245));
 
-        // Form panel
+      
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         formPanel.setBorder(BorderFactory.createTitledBorder("Thông tin sản phẩm"));
@@ -65,7 +65,7 @@ public class EditProductView extends JFrame {
 
         int row = 0;
 
-        // Tên sản phẩm
+      
         gbc.gridy = row++; gbc.gridx = 0;
         formPanel.add(new JLabel("Tên sản phẩm:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -73,7 +73,7 @@ public class EditProductView extends JFrame {
         txtName.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtName, gbc);
 
-        // Giá bán
+        
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Giá bán (VNĐ):"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -81,7 +81,7 @@ public class EditProductView extends JFrame {
         txtPrice.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtPrice, gbc);
 
-        // Số lượng tồn
+    
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Số lượng tồn:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -89,7 +89,7 @@ public class EditProductView extends JFrame {
         txtQuantity.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtQuantity, gbc);
 
-        // Loại phụ kiện
+       
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Loại phụ kiện:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -97,7 +97,7 @@ public class EditProductView extends JFrame {
         txtCategory.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtCategory, gbc);
 
-        // Mô tả
+     
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Mô tả:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -105,7 +105,7 @@ public class EditProductView extends JFrame {
         txtDescription.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtDescription, gbc);
 
-        // Nhà cung cấp
+   
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Nhà cung cấp:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -113,7 +113,7 @@ public class EditProductView extends JFrame {
         txtSupplier.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtSupplier, gbc);
 
-        // Đường dẫn ảnh
+      
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Đường dẫn ảnh:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -121,7 +121,7 @@ public class EditProductView extends JFrame {
         txtImage.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtImage, gbc);
 
-        // Preview ảnh bên phải
+      
         lblImagePreview = new JLabel("Chưa có ảnh", SwingConstants.CENTER);
         lblImagePreview.setPreferredSize(new Dimension(220, 220));
         lblImagePreview.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -132,14 +132,14 @@ public class EditProductView extends JFrame {
         gbc.gridx = 2; gbc.gridy = 0; gbc.gridheight = 7; gbc.anchor = GridBagConstraints.NORTH;
         formPanel.add(lblImagePreview, gbc);
 
-        // Layout: Form panel và image preview
+        
         JPanel contentPanel = new JPanel(new BorderLayout(15, 0));
         contentPanel.setBackground(new Color(245, 245, 245));
         contentPanel.add(formPanel, BorderLayout.CENTER);
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // Nút Lưu và Đóng
+        
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(245, 245, 245));
         
@@ -177,7 +177,7 @@ public class EditProductView extends JFrame {
             return;
         }
 
-        // Điền dữ liệu vào form
+      
         txtName.setText(product.getProductName() != null ? product.getProductName() : "");
         txtPrice.setText(String.valueOf(product.getPrice()));
         txtQuantity.setText(String.valueOf(product.getQuantity()));
@@ -186,7 +186,7 @@ public class EditProductView extends JFrame {
         txtSupplier.setText(product.getSupplier() != null ? product.getSupplier() : "");
         txtImage.setText(product.getImagePath() != null ? product.getImagePath() : "");
 
-        // Load preview ảnh
+       
         loadImagePreview();
     }
 
@@ -231,7 +231,7 @@ public class EditProductView extends JFrame {
                     txtSupplier.getText().trim(),
                     txtImage.getText().trim());
             
-            // Sử dụng controller nếu có, nếu không thì dùng DAO trực tiếp
+            
             if (controller != null) {
                 controller.updateProduct(product);
             } else {
@@ -242,12 +242,12 @@ public class EditProductView extends JFrame {
                 }
             }
             
-            // Refresh parent view nếu có
+           
             if (parentView != null) {
                 parentView.getController().loadAllProducts();
             }
             
-            dispose(); // Đóng form sau khi lưu thành công
+            dispose(); 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Giá và số lượng phải là số hợp lệ!", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
         }

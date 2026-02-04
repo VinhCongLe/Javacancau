@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class OrderDAO {
 
-    // 1️⃣ Tạo hóa đơn - LƯU THỜI GIAN ĐÚNG MÚI GIỜ VIỆT NAM
+   
     public int createOrder(Connection conn, int userId, int customerId, double total) throws SQLException {
         String sql = "INSERT INTO orders (user_id, customer_id, order_date, total_amount) " +
                      "VALUES (?, ?, ?, ?)";
@@ -17,7 +17,7 @@ public class OrderDAO {
             ps.setInt(1, userId);
             ps.setInt(2, customerId);
 
-            // Lấy thời gian hiện tại đúng múi giờ Việt Nam (+07:00)
+            // lay tg VN
             LocalDateTime nowVN = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
             Timestamp timestamp = Timestamp.valueOf(nowVN);
 
@@ -31,11 +31,11 @@ public class OrderDAO {
                 return rs.getInt(1);
             }
         }
-        // Nếu thất bại, trả -1
+        
         return -1;
     }
 
-    // 2️⃣ Thêm chi tiết hóa đơn
+    
     public void addOrderDetail(Connection conn, int orderId, int productId, int quantity, double price) throws SQLException {
         String sql = "INSERT INTO order_details (order_id, product_id, quantity, price) " +
                      "VALUES (?, ?, ?, ?)";
@@ -49,7 +49,7 @@ public class OrderDAO {
         }
     }
 
-    // 3️⃣ Trừ tồn kho sản phẩm
+    
     public void updateQuantity(Connection conn, int productId, int quantity) throws SQLException {
         String sql = "UPDATE products SET quantity = quantity - ? WHERE product_id = ?";
 
@@ -60,7 +60,7 @@ public class OrderDAO {
         }
     }
 
-    // 4️⃣ Lấy tất cả hóa đơn (JOIN với customers để lấy tên và SĐT)
+   
     public ResultSet getAllOrders() throws SQLException {
         String sql = "SELECT o.order_id, o.order_date, o.total_amount, " +
                      "c.name AS customer_name, c.phone AS customer_phone " +
@@ -70,10 +70,10 @@ public class OrderDAO {
 
         Connection conn = DBConnection.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
-        return ps.executeQuery();  // Caller phải close ResultSet + Statement + Connection
+        return ps.executeQuery(); 
     }
 
-    // 5️⃣ Lọc hóa đơn theo khoảng ngày (JOIN với customers để lấy tên và SĐT)
+   
     public ResultSet getOrdersByDate(Date fromDate, Date toDate) throws SQLException {
         String sql = "SELECT o.order_id, o.order_date, o.total_amount, " +
                      "c.name AS customer_name, c.phone AS customer_phone " +
@@ -85,9 +85,9 @@ public class OrderDAO {
         Connection conn = DBConnection.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
 
-        // Chuyển Date → Timestamp, set end-of-day cho toDate nếu cần (tùy logic)
+       
         Timestamp fromTs = new Timestamp(fromDate.getTime());
-        Timestamp toTs = new Timestamp(toDate.getTime() + (24 * 60 * 60 * 1000 - 1)); // Đến 23:59:59.999 của toDate
+        Timestamp toTs = new Timestamp(toDate.getTime() + (24 * 60 * 60 * 1000 - 1)); 
 
         ps.setTimestamp(1, fromTs);
         ps.setTimestamp(2, toTs);
@@ -95,7 +95,7 @@ public class OrderDAO {
         return ps.executeQuery();
     }
 
-    // 6️⃣ Lấy tất cả hóa đơn của một user cụ thể (JOIN với customers để lấy tên và SĐT)
+  
     public ResultSet getOrdersByUserId(int userId) throws SQLException {
         String sql = "SELECT o.order_id, o.order_date, o.total_amount, " +
                      "c.name AS customer_name, c.phone AS customer_phone " +
@@ -110,7 +110,7 @@ public class OrderDAO {
         return ps.executeQuery();
     }
 
-    // 7️⃣ Lọc hóa đơn của một user theo khoảng ngày (JOIN với customers để lấy tên và SĐT)
+   
     public ResultSet getOrdersByUserIdAndDate(int userId, Date fromDate, Date toDate) throws SQLException {
         String sql = "SELECT o.order_id, o.order_date, o.total_amount, " +
                      "c.name AS customer_name, c.phone AS customer_phone " +
@@ -132,7 +132,7 @@ public class OrderDAO {
         return ps.executeQuery();
     }
 
-    // 8️⃣ Lấy chi tiết hóa đơn theo order_id
+    
     public ResultSet getOrderDetails(int orderId) throws SQLException {
         String sql = "SELECT p.product_name, od.quantity, od.price, " +
                      "(od.quantity * od.price) AS total " +
@@ -146,42 +146,42 @@ public class OrderDAO {
         return ps.executeQuery();
     }
 
-    // 9️⃣ Xóa đơn hàng (xóa order_details trước, sau đó xóa order)
+   
     public boolean deleteOrder(int orderId) throws SQLException {
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); // Bắt đầu transaction
+            conn.setAutoCommit(false); 
 
-            // Xóa order_details trước (do foreign key constraint)
+           
             String sqlDeleteDetails = "DELETE FROM order_details WHERE order_id = ?";
             try (PreparedStatement psDetails = conn.prepareStatement(sqlDeleteDetails)) {
                 psDetails.setInt(1, orderId);
                 psDetails.executeUpdate();
             }
 
-            // Xóa order
+           
             String sqlDeleteOrder = "DELETE FROM orders WHERE order_id = ?";
             try (PreparedStatement psOrder = conn.prepareStatement(sqlDeleteOrder)) {
                 psOrder.setInt(1, orderId);
                 int rowsAffected = psOrder.executeUpdate();
                 
                 if (rowsAffected > 0) {
-                    conn.commit(); // Commit transaction nếu thành công
+                    conn.commit(); 
                     return true;
                 } else {
-                    conn.rollback(); // Rollback nếu không có dòng nào bị xóa
+                    conn.rollback(); 
                     return false;
                 }
             }
         } catch (SQLException e) {
             if (conn != null) {
-                conn.rollback(); // Rollback nếu có lỗi
+                conn.rollback(); 
             }
             throw e;
         } finally {
             if (conn != null) {
-                conn.setAutoCommit(true); // Khôi phục auto-commit
+                conn.setAutoCommit(true); 
                 conn.close();
             }
         }

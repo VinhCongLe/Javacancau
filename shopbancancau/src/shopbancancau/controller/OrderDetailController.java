@@ -26,11 +26,11 @@ public class OrderDetailController {
 
         loadOrderDetails(orderId);
 
-        // nút in hóa đơn
+        
         view.addPrintListener(e -> printInvoice());
     }
 
-    // ===== LOAD CHI TIẾT HÓA ĐƠN =====
+    
     private void loadOrderDetails(int orderId) {
         try {
             ResultSet rs = orderDAO.getOrderDetails(orderId);
@@ -53,14 +53,14 @@ public class OrderDetailController {
         }
     }
 
-    // ===== IN HÓA ĐƠN (KHÔNG DÙNG SESSION – AN TOÀN) =====
+    
     private void printInvoice() {
         try {
-            // ngày giờ hiện tại
+            
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             String now = LocalDateTime.now().format(dtf);
 
-            // tên nhân viên (mặc định – đồ án OK)
+            
             String staffName = "Nhân viên bán hàng";
 
             StringBuilder sb = new StringBuilder();

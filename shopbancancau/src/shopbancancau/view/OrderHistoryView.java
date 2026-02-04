@@ -23,11 +23,11 @@ public class OrderHistoryView extends JFrame {
     private JSpinner spinnerFromDate;
     private JSpinner spinnerToDate;
 
-    private JLabel lblTotal; // HIỂN THỊ TỔNG DOANH THU
+    private JLabel lblTotal; 
     private POSView parentView;
 
     public OrderHistoryView() {
-        this.parentView = null; // For standalone use
+        this.parentView = null; 
         initComponents();
     }
 
@@ -37,7 +37,7 @@ public class OrderHistoryView extends JFrame {
     }
     
     private void initComponents() {
-        // Đặt title dựa trên role: ADMIN = "Thống kê", USER = "Lịch sử hóa đơn"
+        
         String title = "Lịch sử hóa đơn";
         if (Session.currentUser != null && "ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
             title = "Thống kê";
@@ -48,12 +48,12 @@ public class OrderHistoryView extends JFrame {
         setDefaultCloseOperation(parentView != null ? JFrame.DO_NOTHING_ON_CLOSE : JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
         
-        // Container cho top panel và filter panel
+       
         JPanel northContainer = new JPanel(new BorderLayout());
         
-        // Window listener và nút Quay lại chỉ khi có parent
+        
         if (parentView != null) {
-            // Window listener: dispose and show parent POSView
+            
             addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
@@ -66,14 +66,14 @@ public class OrderHistoryView extends JFrame {
                 }
             });
             
-            // Nút Quay lại ở góc trên trái
+            
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
             topPanel.setBackground(new Color(245, 245, 245));
             topPanel.setOpaque(false);
             btnBack = new JButton("← Quay lại");
             btnBack.setFont(new Font("Segoe UI", Font.BOLD, 13));
             btnBack.setPreferredSize(new Dimension(120, 35));
-            btnBack.setBackground(new Color(0, 120, 215)); // Màu xanh
+            btnBack.setBackground(new Color(0, 120, 215)); 
             btnBack.setForeground(Color.WHITE);
             btnBack.setFocusPainted(false);
             btnBack.setBorderPainted(false);
@@ -89,16 +89,16 @@ public class OrderHistoryView extends JFrame {
             northContainer.add(topPanel, BorderLayout.NORTH);
         }
 
-        // ===== FILTER PANEL =====
+       
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         filterPanel.setBackground(new Color(245, 245, 245));
 
-        // Label và JSpinner cho "Từ ngày"
+        
         JLabel lblFromDate = new JLabel("Từ ngày:");
         lblFromDate.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         filterPanel.add(lblFromDate);
         
-        // Tạo SpinnerDateModel với format dd/MM/yyyy
+       
         Calendar calFrom = Calendar.getInstance();
         calFrom.set(Calendar.HOUR_OF_DAY, 0);
         calFrom.set(Calendar.MINUTE, 0);
@@ -109,7 +109,7 @@ public class OrderHistoryView extends JFrame {
         modelFrom.setValue(calFrom.getTime());
         spinnerFromDate = new JSpinner(modelFrom);
         
-        // Format hiển thị dd/MM/yyyy
+        
         JSpinner.DateEditor editorFrom = new JSpinner.DateEditor(spinnerFromDate, "dd/MM/yyyy");
         spinnerFromDate.setEditor(editorFrom);
         spinnerFromDate.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -117,7 +117,7 @@ public class OrderHistoryView extends JFrame {
         spinnerFromDate.setBackground(Color.WHITE);
         filterPanel.add(spinnerFromDate);
 
-        // Label và JSpinner cho "Đến ngày"
+        
         JLabel lblToDate = new JLabel("Đến ngày:");
         lblToDate.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         filterPanel.add(lblToDate);
@@ -127,13 +127,13 @@ public class OrderHistoryView extends JFrame {
         calTo.set(Calendar.MINUTE, 0);
         calTo.set(Calendar.SECOND, 0);
         calTo.set(Calendar.MILLISECOND, 0);
-        calTo.add(Calendar.DAY_OF_MONTH, 1); // Mặc định = ngày mai
+        calTo.add(Calendar.DAY_OF_MONTH, 1); 
         
         SpinnerDateModel modelTo = new SpinnerDateModel();
         modelTo.setValue(calTo.getTime());
         spinnerToDate = new JSpinner(modelTo);
         
-        // Format hiển thị dd/MM/yyyy
+        
         JSpinner.DateEditor editorTo = new JSpinner.DateEditor(spinnerToDate, "dd/MM/yyyy");
         spinnerToDate.setEditor(editorTo);
         spinnerToDate.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -141,29 +141,29 @@ public class OrderHistoryView extends JFrame {
         spinnerToDate.setBackground(Color.WHITE);
         filterPanel.add(spinnerToDate);
         
-        // Listener: Tự động điều chỉnh spinnerTo khi spinnerFrom thay đổi (sau khi cả hai đã được tạo)
+        
         spinnerFromDate.addChangeListener(e -> {
             Date fromDate = (Date) spinnerFromDate.getValue();
             Date toDate = (Date) spinnerToDate.getValue();
             
             if (fromDate != null && toDate != null && fromDate.after(toDate)) {
-                // Nếu From > To, tự động set To = From + 1 ngày
+                
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(fromDate);
                 cal.add(Calendar.DAY_OF_MONTH, 1);
                 spinnerToDate.setValue(cal.getTime());
             }
             
-            // Cập nhật trạng thái nút Lọc
+            
             updateFilterButtonState();
         });
         
-        // Listener: Kiểm tra validation khi thay đổi spinnerTo
+        
         spinnerToDate.addChangeListener(e -> {
             updateFilterButtonState();
         });
 
-        // Nút Lọc
+        
         btnFilter = new JButton("Lọc");
         btnFilter.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnFilter.setPreferredSize(new Dimension(80, 30));
@@ -173,23 +173,23 @@ public class OrderHistoryView extends JFrame {
         btnFilter.setBorderPainted(false);
         filterPanel.add(btnFilter);
         
-        // Nút Làm mới
+        
         btnRefresh = new JButton("Làm mới");
         btnRefresh.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnRefresh.setPreferredSize(new Dimension(100, 30));
-        btnRefresh.setBackground(new Color(40, 167, 69)); // Màu xanh lá
+        btnRefresh.setBackground(new Color(40, 167, 69)); 
         btnRefresh.setForeground(Color.WHITE);
         btnRefresh.setFocusPainted(false);
         btnRefresh.setBorderPainted(false);
         filterPanel.add(btnRefresh);
         
-        // Khởi tạo trạng thái nút Lọc
+        
         updateFilterButtonState();
 
         northContainer.add(filterPanel, BorderLayout.SOUTH);
         add(northContainer, BorderLayout.NORTH);
 
-        // ===== TABLE =====
+        
         String[] cols = {"Mã hóa đơn", "Ngày", "Tên người đặt", "SĐT người đặt", "Tổng tiền"};
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
@@ -199,32 +199,32 @@ public class OrderHistoryView extends JFrame {
         };
 
         table = new JTable(tableModel);
-        // Điều chỉnh độ rộng cột
-        table.getColumnModel().getColumn(0).setPreferredWidth(80);  // Mã hóa đơn
-        table.getColumnModel().getColumn(1).setPreferredWidth(150);  // Ngày
-        table.getColumnModel().getColumn(2).setPreferredWidth(150);   // Tên người đặt
-        table.getColumnModel().getColumn(3).setPreferredWidth(120);  // SĐT người đặt
-        table.getColumnModel().getColumn(4).setPreferredWidth(120);   // Tổng tiền
+        
+        table.getColumnModel().getColumn(0).setPreferredWidth(80);  
+        table.getColumnModel().getColumn(1).setPreferredWidth(150);  
+        table.getColumnModel().getColumn(2).setPreferredWidth(150);   
+        table.getColumnModel().getColumn(3).setPreferredWidth(120);  
+        table.getColumnModel().getColumn(4).setPreferredWidth(120);   
         table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         table.setRowHeight(25);
         
         JScrollPane scroll = new JScrollPane(table);
         add(scroll, BorderLayout.CENTER);
 
-        // ===== BOTTOM PANEL =====
+        
         JPanel bottomPanel = new JPanel(new BorderLayout());
 
         lblTotal = new JLabel("Tổng doanh thu: 0 đ");
         lblTotal.setFont(new Font("Arial", Font.BOLD, 14));
         bottomPanel.add(lblTotal, BorderLayout.WEST);
 
-        // Panel chứa các nút bên phải
+        
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         
         btnDelete = new JButton("Xóa");
         btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnDelete.setPreferredSize(new Dimension(100, 35));
-        btnDelete.setBackground(new Color(220, 53, 69)); // Màu đỏ
+        btnDelete.setBackground(new Color(220, 53, 69)); 
         btnDelete.setForeground(Color.WHITE);
         btnDelete.setFocusPainted(false);
         btnDelete.setBorderPainted(false);
@@ -233,7 +233,7 @@ public class OrderHistoryView extends JFrame {
         btnDetail = new JButton("Xem chi tiết");
         btnDetail.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnDetail.setPreferredSize(new Dimension(120, 35));
-        btnDetail.setBackground(new Color(0, 120, 215)); // Màu xanh
+        btnDetail.setBackground(new Color(0, 120, 215)); 
         btnDetail.setForeground(Color.WHITE);
         btnDetail.setFocusPainted(false);
         btnDetail.setBorderPainted(false);
@@ -244,7 +244,7 @@ public class OrderHistoryView extends JFrame {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // ===== GETTERS =====
+    
     public DefaultTableModel getTableModel() {
         return tableModel;
     }
@@ -261,7 +261,6 @@ public class OrderHistoryView extends JFrame {
         btnDelete.addActionListener(l);
     }
 
-    // ===== FILTER SUPPORT =====
     public Date getFromDate() {
         return (Date) spinnerFromDate.getValue();
     }
@@ -300,7 +299,7 @@ public class OrderHistoryView extends JFrame {
         btnRefresh.addActionListener(l);
     }
 
-    // ===== TOTAL LABEL =====
+   
     public void setTotalText(String text) {
         lblTotal.setText(text);
     }

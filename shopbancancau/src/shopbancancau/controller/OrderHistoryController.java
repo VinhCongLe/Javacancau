@@ -33,17 +33,17 @@ public class OrderHistoryController {
         view.addRefreshListener(e -> loadOrders());
     }
 
-    // ===== LOAD ĐƠN HÀNG (PHÂN QUYỀN) =====
+    
     private void loadOrders() {
         try {
             ResultSet rs;
             
-            // Kiểm tra role: ADMIN xem tất cả, USER chỉ xem đơn của mình
+           
             if (Session.currentUser != null && "ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
-                // ADMIN: hiển thị tất cả đơn hàng
+                
                 rs = orderDAO.getAllOrders();
             } else {
-                // USER: chỉ hiển thị đơn hàng của mình
+                // user chỉ xem đơn hàng của mình
                 int userId = Session.currentUser != null ? Session.currentUser.getUserId() : 0;
                 rs = orderDAO.getOrdersByUserId(userId);
             }
@@ -57,7 +57,7 @@ public class OrderHistoryController {
                 double total = rs.getDouble("total_amount");
                 totalSum += total;
 
-                // Lấy tên và SĐT khách hàng (có thể null nếu LEFT JOIN không match)
+                
                 String customerName = rs.getString("customer_name");
                 String customerPhone = rs.getString("customer_phone");
                 if (customerName == null) customerName = "";
@@ -79,13 +79,13 @@ public class OrderHistoryController {
         }
     }
 
-    // ===== LỌC THEO DATE PICKER =====
+    
     private void filterByDate() {
         try {
             java.util.Date fromUtil = view.getFromDate();
             java.util.Date toUtil = view.getToDate();
 
-            // Kiểm tra đã chọn đầy đủ ngày chưa
+            
             if (fromUtil == null || toUtil == null) {
                 int choice = JOptionPane.showConfirmDialog(view,
                         "Bạn chưa chọn đầy đủ ngày. Hiển thị tất cả đơn hàng?",
@@ -93,12 +93,12 @@ public class OrderHistoryController {
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (choice == JOptionPane.YES_OPTION) {
-                    loadOrders(); // Hiển thị tất cả nếu đồng ý
+                    loadOrders(); 
                 }
                 return;
             }
 
-            // Kiểm tra từ ngày <= đến ngày
+           
             if (fromUtil.after(toUtil)) {
                 JOptionPane.showMessageDialog(view,
                         "Từ ngày phải nhỏ hơn hoặc bằng đến ngày",
@@ -107,10 +107,10 @@ public class OrderHistoryController {
                 return;
             }
 
-            // Chuyển đổi java.util.Date sang java.sql.Date
+           
             Date fromDate = new Date(fromUtil.getTime());
             
-            // Đặt toDate đến cuối ngày (23:59:59.999)
+           
             Calendar cal = Calendar.getInstance();
             cal.setTime(toUtil);
             cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -121,12 +121,12 @@ public class OrderHistoryController {
 
             ResultSet rs;
             
-            // Kiểm tra role: ADMIN xem tất cả, USER chỉ xem đơn của mình
+            
             if (Session.currentUser != null && "ADMIN".equalsIgnoreCase(Session.currentUser.getRole())) {
-                // ADMIN: lọc tất cả đơn hàng theo ngày
+                
                 rs = orderDAO.getOrdersByDate(fromDate, toDate);
             } else {
-                // USER: chỉ lọc đơn hàng của mình theo ngày
+               
                 int userId = Session.currentUser != null ? Session.currentUser.getUserId() : 0;
                 rs = orderDAO.getOrdersByUserIdAndDate(userId, fromDate, toDate);
             }
@@ -140,7 +140,7 @@ public class OrderHistoryController {
                 double total = rs.getDouble("total_amount");
                 totalSum += total;
 
-                // Lấy tên và SĐT khách hàng (có thể null nếu LEFT JOIN không match)
+               
                 String customerName = rs.getString("customer_name");
                 String customerPhone = rs.getString("customer_phone");
                 if (customerName == null) customerName = "";
@@ -166,7 +166,7 @@ public class OrderHistoryController {
         }
     }
 
-    // ===== XEM CHI TIẾT =====
+  
     private void showDetail() {
         int row = view.getTable().getSelectedRow();
 
@@ -183,7 +183,7 @@ public class OrderHistoryController {
         detailView.setVisible(true);
     }
 
-    // ===== XÓA ĐƠN HÀNG =====
+    
     private void deleteOrder() {
         int row = view.getTable().getSelectedRow();
 
@@ -230,7 +230,7 @@ public class OrderHistoryController {
                         JOptionPane.INFORMATION_MESSAGE
                     );
                     
-                    // Reload lại danh sách đơn hàng
+                    
                     loadOrders();
                 } else {
                     JOptionPane.showMessageDialog(

@@ -52,7 +52,7 @@ public class CustomerDAO {
 	    return list;
 	}
 
-	// Inner class để lưu thông tin khách hàng
+	// class để lưu thông tin khách hàng
 	public static class CustomerInfo {
 	    private int id;
 	    private String name;

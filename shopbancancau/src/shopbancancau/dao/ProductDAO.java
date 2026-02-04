@@ -7,7 +7,6 @@ import java.util.List;
 
 public class ProductDAO {
 
-    /* LẤY TẤT CẢ SẢN PHẨM (dùng cho quản lý sản phẩm) */
     public List<Product> getAllProducts() {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM products ORDER BY product_id ASC";
@@ -24,7 +23,6 @@ public class ProductDAO {
         return list;
     }
 
-    /* LẤY SẢN PHẨM THEO ID */
     public Product getProductById(int id) {
         String sql = "SELECT * FROM products WHERE product_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -40,7 +38,7 @@ public class ProductDAO {
         return null;
     }
 
-    /* LẤY SẢN PHẨM THEO TÊN (dùng cho POS/bán hàng) */
+    
     public Product getProductByName(String name) {
         String sql = "SELECT * FROM products WHERE product_name = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -56,10 +54,10 @@ public class ProductDAO {
         return null;
     }
 
-    /* LẤY ID SẢN PHẨM THEO TÊN (đã sửa để luôn return int) */
+    
     public int getProductIdByName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            return -1; // Tên không hợp lệ
+            return -1; 
         }
         
         String sql = "SELECT product_id FROM products WHERE product_name = ?";
@@ -73,10 +71,10 @@ public class ProductDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1; // Không tìm thấy sản phẩm → trả về -1
+        return -1; 
     }
 
-    /* THÊM SẢN PHẨM MỚI */
+    
     public boolean addProduct(Product p) {
         String sql = "INSERT INTO products (product_name, price, quantity, category, description, supplier, image_path) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -96,7 +94,7 @@ public class ProductDAO {
         }
     }
 
-    /* SỬA SẢN PHẨM */
+    
     public boolean updateProduct(Product p) {
         String sql = "UPDATE products SET product_name=?, price=?, quantity=?, category=?, " +
                      "description=?, supplier=?, image_path=? WHERE product_id=?";
@@ -117,7 +115,7 @@ public class ProductDAO {
         }
     }
 
-    /* XÓA SẢN PHẨM */
+    
     public boolean deleteProduct(int productId) {
         String sql = "DELETE FROM products WHERE product_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -130,7 +128,7 @@ public class ProductDAO {
         }
     }
 
-    // Hàm hỗ trợ map dữ liệu từ ResultSet sang Product
+    
     private Product mapResultSetToProduct(ResultSet rs) throws SQLException {
         Product p = new Product();
         p.setProductId(rs.getInt("product_id"));

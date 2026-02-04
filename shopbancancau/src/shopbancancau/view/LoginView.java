@@ -29,7 +29,7 @@ public class LoginView extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         
-        // Window listener: Xác nhận trước khi đóng
+       
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -41,9 +41,9 @@ public class LoginView extends JFrame {
                     JOptionPane.QUESTION_MESSAGE
                 );
                 if (confirm == JOptionPane.YES_OPTION) {
-                    System.exit(0); // Thoát ứng dụng hoàn toàn
+                    System.exit(0); 
                 }
-                // Nếu chọn "Hủy", không làm gì - cửa sổ vẫn mở
+               
             }
         });
         
@@ -63,7 +63,7 @@ public class LoginView extends JFrame {
         gbc.gridx = 0;
         gbc.gridwidth = 2;
 
-        // ===== TITLE =====
+       
         JLabel lblTitle = new JLabel("ĐĂNG NHẬP HỆ THỐNG", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 17));
         lblTitle.setForeground(new Color(40, 40, 40));
@@ -73,7 +73,7 @@ public class LoginView extends JFrame {
 
         gbc.insets = new Insets(6, 24, 6, 24);
 
-        // ===== USER =====
+        
         JLabel lblUser = new JLabel("Tên đăng nhập");
         lblUser.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblUser.setForeground(new Color(110, 110, 110));
@@ -84,7 +84,7 @@ public class LoginView extends JFrame {
         gbc.gridy = 2;
         card.add(txtUsername, gbc);
 
-        // ===== PASS =====
+      
         JLabel lblPass = new JLabel("Mật khẩu");
         lblPass.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblPass.setForeground(new Color(110, 110, 110));
@@ -98,7 +98,7 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(6, 24, 6, 24);
         card.add(txtPassword, gbc);
 
-        // ===== BUTTON =====
+      
         btnLogin = new JButton("ĐĂNG NHẬP");
         btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnLogin.setForeground(Color.WHITE);
@@ -113,7 +113,7 @@ public class LoginView extends JFrame {
         add(shadow);
     }
 
-    // ===== INPUT =====
+    
     private JTextField createInput() {
         JTextField field = new JTextField();
         styleInput(field);
@@ -129,7 +129,7 @@ public class LoginView extends JFrame {
         ));
     }
 
-    /* ===== GETTER (thêm mới để LoginController gắn listener Enter) ===== */
+    
     public JTextField getTxtUsername() {
         return txtUsername;
     }
@@ -154,7 +154,7 @@ public class LoginView extends JFrame {
         btnLogin.addActionListener(l);
     }
 
-    // ===== BO GÓC PANEL =====
+   
     static class RoundedPanel extends JPanel {
         private final int radius;
 
@@ -173,7 +173,7 @@ public class LoginView extends JFrame {
         }
     }
 
-    // ===== BORDER INPUT =====
+    
     static class RoundedBorder extends javax.swing.border.AbstractBorder {
         private final int radius;
         private final Color color;
@@ -193,7 +193,7 @@ public class LoginView extends JFrame {
         }
     }
 
-    // ===== SHADOW =====
+    
     static class ShadowPanel extends JPanel {
         public ShadowPanel() {
             setOpaque(false);

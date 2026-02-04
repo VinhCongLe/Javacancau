@@ -11,7 +11,7 @@ import shopbancancau.model.User;
 
 public class UserDAO {
     
-    // Kiểm tra xem cột có tồn tại trong bảng không
+    
     private boolean columnExists(String tableName, String columnName) {
         try (Connection conn = DBConnection.getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
@@ -39,12 +39,12 @@ public class UserDAO {
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setRole(rs.getString("role"));
-                // Thêm fullname và phone nếu có trong DB
+              
                 try {
                     user.setFullname(rs.getString("fullname"));
                     user.setPhone(rs.getString("phone"));
                 } catch (Exception e) {
-                    // Nếu cột không tồn tại, để null
+                    
                 }
                 return user;
             }
@@ -107,12 +107,12 @@ public class UserDAO {
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setRole(rs.getString("role"));
-                // Thêm fullname và phone nếu có trong DB
+                
                 try {
                     user.setFullname(rs.getString("fullname"));
                     user.setPhone(rs.getString("phone"));
                 } catch (Exception e) {
-                    // Nếu cột không tồn tại, để null
+                    
                 }
                 return user;
             }
@@ -137,12 +137,12 @@ public class UserDAO {
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setRole(rs.getString("role"));
-                // Thêm fullname và phone nếu có trong DB
+               
                 try {
                     user.setFullname(rs.getString("fullname"));
                     user.setPhone(rs.getString("phone"));
                 } catch (Exception e) {
-                    // Nếu cột không tồn tại, để null
+                   
                 }
                 list.add(user);
             }
@@ -162,7 +162,7 @@ public class UserDAO {
         
         try (Connection conn = DBConnection.getConnection()) {
             if (hasFullname && hasPhone) {
-                // Cả hai cột đều tồn tại
+                
                 sql = "UPDATE users SET password = ?, fullname = ?, phone = ?, role = ? WHERE user_id = ?";
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, password);
@@ -171,7 +171,7 @@ public class UserDAO {
                 ps.setString(4, role);
                 ps.setInt(5, userId);
             } else if (hasFullname) {
-                // Chỉ có fullname
+                
                 sql = "UPDATE users SET password = ?, fullname = ?, role = ? WHERE user_id = ?";
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, password);
@@ -179,7 +179,7 @@ public class UserDAO {
                 ps.setString(3, role);
                 ps.setInt(4, userId);
             } else if (hasPhone) {
-                // Chỉ có phone
+                
                 sql = "UPDATE users SET password = ?, phone = ?, role = ? WHERE user_id = ?";
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, password);
@@ -187,7 +187,7 @@ public class UserDAO {
                 ps.setString(3, role);
                 ps.setInt(4, userId);
             } else {
-                // Không có cả hai cột, chỉ update các cột cơ bản
+                
                 sql = "UPDATE users SET password = ?, role = ? WHERE user_id = ?";
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, password);
@@ -213,7 +213,7 @@ public class UserDAO {
         
         try (Connection conn = DBConnection.getConnection()) {
             if (hasFullname && hasPhone) {
-                // Cả hai cột đều tồn tại
+                
                 sql = "UPDATE users SET username = ?, password = ?, fullname = ?, phone = ?, role = ? WHERE user_id = ?";
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, username);
@@ -223,7 +223,7 @@ public class UserDAO {
                 ps.setString(5, role);
                 ps.setInt(6, userId);
             } else if (hasFullname) {
-                // Chỉ có fullname
+               
                 sql = "UPDATE users SET username = ?, password = ?, fullname = ?, role = ? WHERE user_id = ?";
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, username);
@@ -232,7 +232,7 @@ public class UserDAO {
                 ps.setString(4, role);
                 ps.setInt(5, userId);
             } else if (hasPhone) {
-                // Chỉ có phone
+               
                 sql = "UPDATE users SET username = ?, password = ?, phone = ?, role = ? WHERE user_id = ?";
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, username);
@@ -241,7 +241,7 @@ public class UserDAO {
                 ps.setString(4, role);
                 ps.setInt(5, userId);
             } else {
-                // Không có cả hai cột, chỉ update các cột cơ bản
+               
                 sql = "UPDATE users SET username = ?, password = ?, role = ? WHERE user_id = ?";
                 ps = conn.prepareStatement(sql);
                 ps.setString(1, username);
@@ -294,7 +294,7 @@ public class UserDAO {
     }
 
     public void insertUser(String username, String role) {
-        // Tạo password mặc định là "123456"
+       
         String defaultPassword = "123456";
         String sql = "INSERT INTO users(username, password, role) VALUES (?, ?, ?)";
 

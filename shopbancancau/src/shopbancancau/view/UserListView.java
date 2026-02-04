@@ -30,13 +30,13 @@ public class UserListView extends JFrame {
         setLayout(new BorderLayout(5, 5));
         getContentPane().setBackground(new Color(245, 245, 245));
 
-        // Title
+       
         JLabel lblTitle = new JLabel("Danh sách người dùng", JLabel.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Table
+       
         String[] columns = {"ID", "Username", "Role"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -56,7 +56,7 @@ public class UserListView extends JFrame {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Danh sách người dùng"));
         add(scrollPane, BorderLayout.CENTER);
 
-        // Nút chức năng
+       
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
         btnAdd = new JButton("Thêm mới");
@@ -116,7 +116,7 @@ public class UserListView extends JFrame {
         if (confirm == JOptionPane.YES_OPTION) {
             userDAO.deleteUser(userId);
             JOptionPane.showMessageDialog(this, "Xóa thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-            loadUsers(); // Refresh danh sách
+            loadUsers(); 
         }
     }
 

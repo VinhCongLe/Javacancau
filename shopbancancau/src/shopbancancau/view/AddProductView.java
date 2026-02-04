@@ -28,18 +28,18 @@ public class AddProductView extends JFrame {
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(245, 245, 245));
 
-        // Title
+       
         JLabel lblTitle = new JLabel("Thêm sản phẩm mới", JLabel.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Panel chính
+        
         JPanel mainPanel = new JPanel(new BorderLayout(15, 15));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         mainPanel.setBackground(new Color(245, 245, 245));
 
-        // Form panel
+      
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         formPanel.setBorder(BorderFactory.createTitledBorder("Thông tin sản phẩm"));
@@ -50,7 +50,7 @@ public class AddProductView extends JFrame {
 
         int row = 0;
 
-        // Tên sản phẩm
+       
         gbc.gridy = row++; gbc.gridx = 0;
         formPanel.add(new JLabel("Tên sản phẩm:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -58,7 +58,7 @@ public class AddProductView extends JFrame {
         txtName.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtName, gbc);
 
-        // Giá bán
+       
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Giá bán (VNĐ):"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -66,7 +66,7 @@ public class AddProductView extends JFrame {
         txtPrice.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtPrice, gbc);
 
-        // Số lượng tồn
+       
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Số lượng tồn:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -74,7 +74,7 @@ public class AddProductView extends JFrame {
         txtQuantity.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtQuantity, gbc);
 
-        // Loại phụ kiện
+       
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Loại phụ kiện:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -82,7 +82,7 @@ public class AddProductView extends JFrame {
         txtCategory.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtCategory, gbc);
 
-        // Mô tả
+      
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Mô tả:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -90,7 +90,7 @@ public class AddProductView extends JFrame {
         txtDescription.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtDescription, gbc);
 
-        // Nhà cung cấp
+       
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Nhà cung cấp:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -98,7 +98,7 @@ public class AddProductView extends JFrame {
         txtSupplier.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         formPanel.add(txtSupplier, gbc);
 
-        // Đường dẫn ảnh
+        
         gbc.gridy = row++; gbc.gridx = 0; gbc.weightx = 0;
         formPanel.add(new JLabel("Đường dẫn ảnh:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -107,7 +107,7 @@ public class AddProductView extends JFrame {
         txtImage.addActionListener(e -> loadImagePreview());
         formPanel.add(txtImage, gbc);
 
-        // Preview ảnh bên phải
+       
         lblImagePreview = new JLabel("Chưa có ảnh", SwingConstants.CENTER);
         lblImagePreview.setPreferredSize(new Dimension(220, 220));
         lblImagePreview.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -118,14 +118,14 @@ public class AddProductView extends JFrame {
         gbc.gridx = 2; gbc.gridy = 0; gbc.gridheight = 7; gbc.anchor = GridBagConstraints.NORTH;
         formPanel.add(lblImagePreview, gbc);
 
-        // Layout: Form panel và image preview
+      
         JPanel contentPanel = new JPanel(new BorderLayout(15, 0));
         contentPanel.setBackground(new Color(245, 245, 245));
         contentPanel.add(formPanel, BorderLayout.CENTER);
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // Nút Thêm và Đóng
+     
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(245, 245, 245));
         
@@ -196,7 +196,7 @@ public class AddProductView extends JFrame {
                     txtImage.getText().trim());
             
             controller.addProduct(product);
-            dispose(); // Đóng form sau khi thêm thành công
+            dispose(); 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Giá và số lượng phải là số hợp lệ!", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
         }
