@@ -11,8 +11,8 @@ public class ProductDAO {
         List<Product> list = new ArrayList<>();
         String sql = "SELECT * FROM products ORDER BY product_id ASC";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Product p = mapResultSetToProduct(rs);
                 list.add(p);
@@ -26,7 +26,7 @@ public class ProductDAO {
     public Product getProductById(int id) {
         String sql = "SELECT * FROM products WHERE product_id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -38,11 +38,10 @@ public class ProductDAO {
         return null;
     }
 
-    
     public Product getProductByName(String name) {
         String sql = "SELECT * FROM products WHERE product_name = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -54,15 +53,14 @@ public class ProductDAO {
         return null;
     }
 
-    
     public int getProductIdByName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            return -1; 
+            return -1;
         }
-        
+
         String sql = "SELECT product_id FROM products WHERE product_name = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -71,15 +69,15 @@ public class ProductDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1; 
+        return -1;
     }
 
-    
     public boolean addProduct(Product p) {
-        String sql = "INSERT INTO products (product_name, price, quantity, category, description, supplier, image_path) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (product_name, price, quantity, category, description, supplier, image_path) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, p.getProductName());
             ps.setDouble(2, p.getPrice());
             ps.setInt(3, p.getQuantity());
@@ -94,12 +92,11 @@ public class ProductDAO {
         }
     }
 
-    
     public boolean updateProduct(Product p) {
         String sql = "UPDATE products SET product_name=?, price=?, quantity=?, category=?, " +
-                     "description=?, supplier=?, image_path=? WHERE product_id=?";
+                "description=?, supplier=?, image_path=? WHERE product_id=?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, p.getProductName());
             ps.setDouble(2, p.getPrice());
             ps.setInt(3, p.getQuantity());
@@ -115,11 +112,10 @@ public class ProductDAO {
         }
     }
 
-    
     public boolean deleteProduct(int productId) {
         String sql = "DELETE FROM products WHERE product_id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -128,7 +124,6 @@ public class ProductDAO {
         }
     }
 
-    
     private Product mapResultSetToProduct(ResultSet rs) throws SQLException {
         Product p = new Product();
         p.setProductId(rs.getInt("product_id"));
@@ -140,5 +135,55 @@ public class ProductDAO {
         p.setSupplier(rs.getString("supplier"));
         p.setImagePath(rs.getString("image_path"));
         return p;
+    }
+
+    /**
+     * Lấy danh sách loại phụ kiện không trùng lặp từ database
+     * 
+     * @return List các category duy nhất, đã sắp xếp theo alphabet
+     */
+    public List<String> getDistinctCategories() {
+        List<String> categories = new ArrayList<>();
+        String sql = "SELECT DISTINCT category FROM products " +
+                "WHERE category IS NOT NULL AND category != '' " +
+                "ORDER BY category";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                categories.add(rs.getString("category"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return categories;
+    }
+
+    /**
+     * Lấy danh sách nhà cung cấp không trùng lặp từ database
+     * 
+     * @return List các supplier duy nhất, đã sắp xếp theo alphabet
+     */
+    public List<String> getDistinctSuppliers() {
+        List<String> suppliers = new ArrayList<>();
+        String sql = "SELECT DISTINCT supplier FROM products " +
+                "WHERE supplier IS NOT NULL AND supplier != '' " +
+                "ORDER BY supplier";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                suppliers.add(rs.getString("supplier"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return suppliers;
     }
 }
